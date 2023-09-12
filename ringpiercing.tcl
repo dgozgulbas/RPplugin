@@ -33,17 +33,17 @@ package require cispeptide
 package require mdff
 
 #======================================================
-namespace eval ::RPresolver:: {
+namespace eval ::RingPiercing:: {
     variable dirPackage $env(MMPDIR)
     variable dirCharmmPar $env(CHARMMPARDIR)
 
     variable w 
     
-    variable psffile "path2structure.psf"
-    variable pdbfile "path2structure.pdb"
+    variable psffile "system.psf"
+    variable pdbfile "system.pdb"
     variable custom_conffile 0
     variable addtopfile 0
-    variable conffile "path2configuration.inp"; # this configuration file must already run properly in the current directory
+    variable conffile "configuration.inp"; # this configuration file must already run properly in the current directory
     #variable conffile {}; # this configuration file must already run properly in the current directory
     variable outputpath [pwd]; #output directory, default is current directory
     # Specify atomselect containing lipid residues that one wants to exchange
@@ -64,15 +64,8 @@ namespace eval ::RPresolver:: {
     variable exchange 50; 	# Exchanging almost all lipids may result in bad membranes
     # Number of replicas to generate
     variable nreplicas 1
-    # Specify equilibration 1 and 2 protocol. Modify .conf file so to obtain restart files at the end of equilibrations
-    # Variables determine number of steps for minimization and MD for each equilibration. In the second equilibration
-    # 5 cycles of MD with decreasing grid force are used and "runsteps2" defines the steps in each cycle (double in the last).
-    variable num_min1 1000
-    variable num_md1 2000
-    variable num_min2 1000
-    variable num_md2 2000
-    variable namdcommand "namd2"
-    variable namdcommandOpt 
+    variable namdbin "namd2"
+    variable namdargs 
     # Other variables
     variable consoleMaxHistory 100
     variable consoleMessageCount 0
@@ -83,52 +76,40 @@ namespace eval ::RPresolver:: {
     variable setGridForceOn 1; # Internal use only. Should always be set to 1
 }
 
-proc mmp {} {
-    return [eval ::RPresolver::RPresolver]
-}
-
-proc RPresolver_tk {} {
-    RPresolver::RPresolver
-    return $RPresolver::w
-}
-
-#======================================================
-
-### Procedure GUI: create the window and initialize data structures ###
-
-proc ::RPresolver::RPresolver {} {
+#UNCOMMENT HERE
+# proc ::RingPiercing::ringpiercing {} {
 variable psffile
 
-    # ::RPresolver::init_default_topology
+    # ::RingPiercing::init_default_topology
     variable w
-    if { [winfo exists .RPresolver] } {
-        wm deiconify .RPresolver
+    if { [winfo exists .ringpiercing] } {
+        wm deiconify .ringpiercing
         return
     }
     
-    set w [toplevel ".RPresolver"]
+    set w [toplevel ".ringpiercing"]
     wm title $w "Ring Piercing Resolver"
     wm resizable $w 1 1
     
-    trace add variable ::RPresolver::restrained write ::RPresolver::write_state
-    trace add variable ::RPresolver::custom_conffile write ::RPresolver::write_state_1
-    trace add variable ::RPresolver::restrainedbilayer write ::RPresolver::write_state_2
+    trace add variable ::RingPiercing::restrained write ::RingPiercing::write_state
+    trace add variable ::RingPiercing::custom_conffile write ::RingPiercing::write_state_1
+    trace add variable ::RingPiercing::restrainedbilayer write ::RingPiercing::write_state_2
 
-    trace add variable ::RPresolver::psffile write ::RPresolver::psffileCheck
-    trace add variable ::RPresolver::pdbfile write ::RPresolver::pdbfileCheck
-    trace add variable ::RPresolver::conffile write ::RPresolver::conffileCheck
-    trace add variable ::RPresolver::outputpath write ::RPresolver::outputpathCheck
-    trace add variable ::RPresolver::lselection write ::RPresolver::lselectionCheck
-    trace add variable ::RPresolver::forceconstbilayer write ::RPresolver::forceconstbilayerCheck
-    trace add variable ::RPresolver::forceconst write ::RPresolver::forceconstCheck
-    trace add variable ::RPresolver::restrainedselection write ::RPresolver::restrainedselectionCheck
-    trace add variable ::RPresolver::exchange write ::RPresolver::exchangeCheck
-    trace add variable ::RPresolver::nreplicas write ::RPresolver::nreplicasCheck
-    trace add variable ::RPresolver::num_min1 write ::RPresolver::min1Check
-    trace add variable ::RPresolver::num_min2 write ::RPresolver::min2Check
-    trace add variable ::RPresolver::num_md1 write ::RPresolver::md1Check
-    trace add variable ::RPresolver::num_md2 write ::RPresolver::md2Check
-    trace add variable ::RPresolver::namdcommand write ::RPresolver::namdcommandCheck
+    trace add variable ::RingPiercing::psffile write ::RingPiercing::psffileCheck
+    trace add variable ::RingPiercing::pdbfile write ::RingPiercing::pdbfileCheck
+    trace add variable ::RingPiercing::conffile write ::RingPiercing::conffileCheck
+    trace add variable ::RingPiercing::outputpath write ::RingPiercing::outputpathCheck
+    trace add variable ::RingPiercing::lselection write ::RingPiercing::lselectionCheck
+    trace add variable ::RingPiercing::forceconstbilayer write ::RingPiercing::forceconstbilayerCheck
+    trace add variable ::RingPiercing::forceconst write ::RingPiercing::forceconstCheck
+    trace add variable ::RingPiercing::restrainedselection write ::RingPiercing::restrainedselectionCheck
+    trace add variable ::RingPiercing::exchange write ::RingPiercing::exchangeCheck
+    trace add variable ::RingPiercing::nreplicas write ::RingPiercing::nreplicasCheck
+    trace add variable ::RingPiercing::num_min1 write ::RingPiercing::min1Check
+    trace add variable ::RingPiercing::num_min2 write ::RingPiercing::min2Check
+    trace add variable ::RingPiercing::num_md1 write ::RingPiercing::md1Check
+    trace add variable ::RingPiercing::num_md2 write ::RingPiercing::md2Check
+    trace add variable ::RingPiercing::namdbin write ::RingPiercing::namdbinCheck
     
     set f $w
     
@@ -145,9 +126,9 @@ variable psffile
     menu $f.menubar.help.menu -tearoff no
     $f.menubar.help.menu add command -label "About" \
     -command {tk_messageBox -type ok -title "About Membrane Mixer" \
-    -message "This plugin resolvs ring piercings within a structural model. It utilizes the alchemical module to lower the energetic barrier for relocating atoms that are piercing through the ring structure. Additionally, a volumetric grid is employed to exert forces that push these atoms away from the ring. The entire system is then subjected to minimization through short molecular dynamics simulations.\n \nAuthors:\nDefne Gorgun Ozgulbas\nJosh Vermaas"}
+    -message "This plugin finds and resolves ring piercings caused by systemic clashes using alchemical methods and grid-force potentials.\n \nAuthors:\nDefne Gorgun Ozgulbas\nJosh Vermaas"}
     $f.menubar.help.menu add command -label "Help..." \
-    -command "vmd_open_url [string trimright [vmdinfo www] /]/plugins/RPresolver"
+    -command "vmd_open_url [string trimright [vmdinfo www] /]/plugins/ringpiercing"
     grid $f.menubar.help -column 0 -row 0 -sticky e -padx 0 -pady 0
     grid columnconfigure $f.menubar 0 -weight 1
     
@@ -157,39 +138,39 @@ variable psffile
     grid $f.input -column 0 -row 1 -sticky nsew -padx 4 -pady "3 4"
     grid rowconfigure $f 1 -weight 1
     
-    grid [label $f.input.label -text "Input:"] -row 0 -column 0 -columnspan 1 -sticky nw
+    grid [label $f.input.label -text "Input files:"] -row 0 -column 0 -columnspan 1 -sticky nw
     grid [label $f.input.psflabel -text "PSF file: "] -row 1 -column 0 -sticky nw
-    grid [entry $f.input.psfpath -width 30 -textvariable ::RPresolver::psffile] -row 1 -column 1 -columnspan 2 -sticky nwe
+    grid [entry $f.input.psfpath -width 30 -textvariable ::RingPiercing::psffile] -row 1 -column 1 -columnspan 2 -sticky nwe
     grid [button $f.input.psfbutton -text "Browse" \
         -command {
             set tempfile [tk_getOpenFile -title "Select a PSF file"]
-            if {![string equal $tempfile ""]} { set ::RPresolver::psffile $tempfile }
+            if {![string equal $tempfile ""]} { set ::RingPiercing::psffile $tempfile }
         }] -row 1 -column 3 -sticky ne
     grid columnconfigure $f.input 1 -weight 1 -minsize 140
-    foreach l {"label" "path" "button"} {::TKTOOLTIP::balloon $f.input.psf${l} "Select the .psf file containing the topology information of your initial membrane"}
+    foreach l {"label" "path" "button"} {::TKTOOLTIP::balloon $f.input.psf${l} "Select the .psf file containing the topology information of your initial system"}
     grid [label $f.input.pdblabel -text "PDB file: "] -row 2 -column 0 -sticky nw
-    grid [entry $f.input.pdbpath -width 30 -textvariable ::RPresolver::pdbfile] -row 2 -column 1 -columnspan 2 -sticky nwe
+    grid [entry $f.input.pdbpath -width 30 -textvariable ::RingPiercing::pdbfile] -row 2 -column 1 -columnspan 2 -sticky nwe
     grid [button $f.input.pdbbutton -text "Browse" \
         -command {
             set tempfile [tk_getOpenFile -title "Select a PDB file"]
-            if {![string equal $tempfile ""]} { set ::RPresolver::pdbfile $tempfile }
+            if {![string equal $tempfile ""]} { set ::RingPiercing::pdbfile $tempfile }
         }] -row 2 -column 3 -sticky nw
-    foreach l {"label" "path" "button"} {::TKTOOLTIP::balloon $f.input.pdb${l} "Select the .pdb file containing the coordinate information of your initial membrane"}
+    foreach l {"label" "path" "button"} {::TKTOOLTIP::balloon $f.input.pdb${l} "Select the .pdb file containing the coordinate information of your initial system"}
     
-    grid [checkbutton $f.input.dconff -text "Use a custom configuration file" -variable ::RPresolver::custom_conffile] -row 3 -column 0 -columnspan 2 -sticky nw
+    grid [checkbutton $f.input.dconff -text "Use a custom configuration file" -variable ::RingPiercing::custom_conffile] -row 3 -column 0 -columnspan 2 -sticky nw
     ::TKTOOLTIP::balloon $f.input.dconff "If active, a custom NAMD configuration file can be selected.\nOtherwise the plugin uses default simulation options with CHARMM36 parameters."
     
-    grid [label $f.input.conflabel -text "CONF file: " -state disabled] -row 4 -column 0 -sticky w
-    grid [entry $f.input.confpath -width 30 -textvariable ::RPresolver::conffile -state disabled] -row 4 -column 1 -columnspan 2 -sticky ew
+    grid [label $f.input.conflabel -text "conf file: " -state disabled] -row 4 -column 0 -sticky w
+    grid [entry $f.input.confpath -width 30 -textvariable ::RingPiercing::conffile -state disabled] -row 4 -column 1 -columnspan 2 -sticky ew
     grid [button $f.input.confbutton -text "Browse" \
         -command {
             set tempfile [tk_getOpenFile -title "Select a custom configuration file"]
-            if {![string equal $tempfile ""]} { set ::RPresolver::conffile $tempfile }
+            if {![string equal $tempfile ""]} { set ::RingPiercing::conffile $tempfile }
         } -state disabled] -row 4 -column 3 -sticky w
     foreach l {"label" "path" "button"} {::TKTOOLTIP::balloon $f.input.conf${l} "Provide a configuration file to run the equilibration of the membrane.\nCheck if it is already usable with the selected system without errors.\nThe file will be modified by the plugin to account for other settings."}
     
     listbox $f.input.list -activestyle dotbox -yscroll "$f.input.scroll set" -width 60 -height 2  -setgrid 1 -selectmode browse -selectbackground white \
-    -listvariable ::RPresolver::parfiles -relief sunken -exportselection 0 \
+    -listvariable ::RingPiercing::parfiles -relief sunken -exportselection 0 \
     -selectbackground lightsteelblue -selectmode extended
     scrollbar $f.input.scroll -command "$f.input.list yview"
 
@@ -201,14 +182,14 @@ variable psffile
         set temploc [tk_getOpenFile -title "Select additional parameter file(s)" -filetypes $toptypes -multiple true]
             if {$temploc!=""} {
                 foreach f $temploc {
-                    lappend ::RPresolver::parfiles $f
+                    lappend ::RingPiercing::parfiles $f
                 }
             }
     }]
     button $f.input.delete -text "Delete" -command [namespace code {
-        set lisDel [lreverse [.RPresolver.input.list curselection]]
+        set lisDel [lreverse [.RingPiercing.input.list curselection]]
         foreach i $lisDel {
-            .RPresolver.input.list delete $i
+            .RingPiercing.input.list delete $i
         }
     }]
     grid [label $f.input.toplabel -text "Additional parameter files: "] -row 5 -column 0 -columnspan 2  -sticky w
@@ -220,103 +201,42 @@ variable psffile
     foreach l {"list" "scroll" "add"} {::TKTOOLTIP::balloon $f.input.${l} "If needed, include additional parameter files to run NAMD simulations.\nFor instance, you can use the default configuration file and\ninclude additional parameters for residues that are not in CHARMM."}
     ::TKTOOLTIP::balloon $f.input.delete "Remove selected parameter files."
 
-    grid [label $f.input.outputlabel -text "Output path: "] -row 8 -column 0 -sticky w
-    grid [entry $f.input.outputpath -width 30 -textvariable ::RPresolver::outputpath] -row 8 -column 1 -columnspan 2 -sticky ew
+    grid [label $f.input.outputlabel -text "Output: "] -row 8 -column 0 -sticky w
+    grid [entry $f.input.outputpath -width 30 -textvariable ::RingPiercing::outputpath] -row 8 -column 1 -columnspan 2 -sticky ew
     grid [button $f.input.outputbutton -text "Browse" \
         -command {
-            set tempdir [tk_chooseDirectory -title "Select an output folder"]
-            if {![string equal $tempdir ""]} { set ::RPresolver::outputpath $tempdir }
+            set tempdir [tk_chooseDirectory -title "Select an output path"]
+            if {![string equal $tempdir ""]} { set ::RingPiercing::outputpath $tempdir }
         }] -row 8 -column 3 -sticky ew
     foreach l {"label" "path" "button"} {::TKTOOLTIP::balloon $f.input.output${l} "Provide an output path that specifies the master folder for running the simulations.\nMembrane replicas will be moved in separate folders within the master folder."}
 
-    
-    # Lipid Selection
-    frame $f.selection -bd 2 -relief ridge 
-    grid $f.selection -column 0 -row 2 -sticky nsew -padx 4 -pady 4
-    
-    grid [label $f.selection.lipidselectionlabel -text "Lipid selection: "] -row 0 -column 0 -sticky w
-    grid [entry $f.selection.lselection -width 30 -textvariable ::RPresolver::lselection] -row 0 -column 1 -columnspan 2 -sticky ew
-    grid [button $f.selection.lselectionGuess -text " Guess " \
-        -command {
-            set ::RPresolver::lselection [::RPresolver::GuessLipidSel]
-        }] -row 0 -column 3 -sticky ew
-    foreach l {"lipidselectionlabel" "lselection"} {::TKTOOLTIP::balloon $f.selection.${l} "Specify the selection that contains the lipids to be exchanged.\nThe \"resid\" is used to detect each lipid molecule."}
-    ::TKTOOLTIP::balloon $f.selection.lselectionGuess "Guess \"segname\" containing lipids in input PSF and PDB files."
-    grid columnconfigure $f.selection 1 -weight 1 -minsize 130
-
-    grid [checkbutton $f.selection.restrainedbilayer -text "Restrain bilayer" -variable ::RPresolver::restrainedbilayer] -row 1 -column 0 -columnspan 2 -sticky w
-    grid [label $f.selection.forceconstbilayerlabel -text "Force constant \[kcal/mol\]:" -state normal] -row 1 -column 2 -sticky e
-    grid [entry $f.selection.forceconstbilayer -width 8 -textvariable ::RPresolver::forceconstbilayer -state normal] -row 1 -column 3 -sticky ew
-    foreach l {"restrainedbilayer" "forceconstbilayerlabel" "forceconstbilayer"} {::TKTOOLTIP::balloon $f.selection.${l} "Add colvar to restrain phosphorus atoms (and oxygen of cholesterol, if present) in each leaflet.\nThis is highly recommended as otherwise the two leaflets will fly apart.\nIncrease the force constant if you still observe large leaflet separation.\nIf this option is used, any other \"colvar\" in the original conf file will be removed.\nDo not need to use if proper membrane restraints are already specified in the configuration file."}
-    
-    grid [checkbutton $f.selection.restrained -text "Restrain group" -variable ::RPresolver::restrained] -row 2 -column 0 -columnspan 2 -sticky w
-    grid [label $f.selection.forceconstlabel -text "Force constant \[kcal/mol\]:" -state disabled] -row 2 -column 2 -sticky e
-    grid [entry $f.selection.forceconst -width 8 -textvariable ::RPresolver::forceconst -state disabled] -row 2 -column 3 -sticky ew
-    foreach l {"restrained" "forceconstlabel" "forceconst"} {::TKTOOLTIP::balloon $f.selection.${l} "Add a restrain on a group of atoms, e.g. on a protein.\nThis avoids the restrained group to move away from its original equilibrium conformation.\nIf this option is used, any other \"constrain\" in the original conf file will be removed.\nDo not need to use if proper constraints are already specified in the configuration file."}
-    grid [label $f.selection.restrainedselectionlabel -text "Group selection: " -state disabled] -row 3 -column 0 -sticky w
-    grid [entry $f.selection.restrainedselection -width 30 -textvariable ::RPresolver::restrainedselection -state disabled] -row 3 -column 1 -columnspan 3 -sticky ew
-    foreach l {"restrainedselectionlabel" "restrainedselection"} {::TKTOOLTIP::balloon $f.selection.${l} "Selection of group of atoms to restrain."}
-    grid [checkbutton $f.selection.exProc -text "Exchange only XY, keeping original Z" -variable ::RPresolver::ExProc] -row 4 -column 0 -columnspan 2 -sticky w
-    ::TKTOOLTIP::balloon $f.selection.exProc "If this option is selected, only the X and Y coordinates of the center of mass of the two\nexchanging lipids will be used (best choice in most cases). Otherwise, full center of mass is used."
-
-    
-    # Membrane-related settings
-    frame $f.parameters -bd 2 -relief ridge
-    grid $f.parameters -column 0 -row 3 -sticky nsew -padx 4 -pady 4
-    
-    grid [label $f.parameters.exchangelabel -text "Lipid exchange (%): "] -row 0 -column 0 -sticky w
-    grid [entry $f.parameters.exchange -width 8 -textvariable ::RPresolver::exchange] -row 0 -column 1 -sticky w
-    foreach l {"exchangelabel" "exchange"} {::TKTOOLTIP::balloon $f.parameters.${l} "Percentage of molecules in \"Lipid selection\" to exchange."}
-    grid [label $f.parameters.nreplicaslabel -text "Num. of membrane replicas: "] -row 0 -column 2 -sticky e
-    grid [entry $f.parameters.nreplicas -width 8 -textvariable ::RPresolver::nreplicas] -row 0 -column 3 -sticky e
-    foreach l {"nreplicaslabel" "nreplicas"} {::TKTOOLTIP::balloon $f.parameters.${l} "Number of membrane replicas that will be serially generated by the plugin."}
-    grid columnconfigure $f.parameters " 1 " -weight 1 -minsize 55
-    
-    
-    frame $f.moldyn -bd 2 -relief ridge
-    grid $f.moldyn -column 0 -row 4 -sticky nsew -padx 4 -pady 4
-    
-    grid [label $f.moldyn.firstmdlabel -text "First equilibration:"] -row 0 -column 0 -sticky w
-    grid [label $f.moldyn.secondmdlabel -text "Second equilibration:"] -row 0 -column 2 -sticky w
-    grid [label $f.moldyn.min1 -text "Min. steps: "] -row 1 -column 0 -sticky w
-    grid [label $f.moldyn.min2 -text "Min. steps: "] -row 1 -column 2 -sticky e
-    grid [label $f.moldyn.md1 -text "MD  steps: "] -row 2 -column 0 -sticky w
-    grid [label $f.moldyn.md2 -text "MD  steps: "] -row 2 -column 2 -sticky e
-    grid [entry $f.moldyn.num_min1 -width 8 -textvariable ::RPresolver::num_min1] -row 1 -column 1 -sticky w
-    grid [entry $f.moldyn.num_md1 -width 8 -textvariable ::RPresolver::num_md1] -row 2 -column 1 -sticky w
-    grid [entry $f.moldyn.num_min2 -width 8 -textvariable ::RPresolver::num_min2] -row 1 -column 3 -sticky w
-    grid [entry $f.moldyn.num_md2 -width 8 -textvariable ::RPresolver::num_md2] -row 2 -column 3 -sticky w
-    foreach l {"firstmdlabel" "min1" "md1" "num_min1" "num_md1"} {::TKTOOLTIP::balloon $f.moldyn.${l} "Before exchanging the lipids the following protocol is performed:\n 1) Generation of a lipid-repulsive grid-force potential around the lipids to exchange\n 2) Minimization of the system of \"Min. steps\" steps under the grid-force potential\n 3) MD equilibration of the system of \"MD. steps\" steps under the grid-force potential"}
-    foreach l {"secondmdlabel" "min2" "md2" "num_min2" "num_md2"} {::TKTOOLTIP::balloon $f.moldyn.${l} "After exchanging the lipids the following protocol is performed:\n 1) Generation of a lipid-repulsive grid-force potential around the exchange lipids\n 2) Minimization of the system of \"Min. steps\" steps under the grid-force potential\n 3) 4 MD equilibrations of the system each of \"MD. steps\" steps under a decreasing grid-force potential\n 4) MD equilibration of the system of 2*\"MD. steps\" steps without grid-force potential"}
-    grid columnconfigure $f.moldyn 1 -weight 1 -minsize 55
-    
-    # Run plugin
+     # Run plugin
     frame $f.run -bd 2 -relief ridge
     grid $f.run -column 0 -row 5 -sticky nsew -padx 4 -pady 4
     
     grid [label $f.run.label -text "Run:"] -row 0 -column 0 -columnspan 1 -sticky w
     
-    #variable namdcommand "/Projects/namd2/bin/2.13/Linux64-multicore/namd2"
+    #variable namdbin "/Projects/namd2/bin/2.13/Linux64-multicore/namd2"
     grid [label  $f.run.namdlabel -text "NAMD path:"] -row 1 -column 0 -sticky w
-    grid [entry  $f.run.namdcommand -width 30 -textvariable ::RPresolver::namdcommand] -row 1 -column 1 -sticky ew
+    grid [entry  $f.run.namdbin -width 30 -textvariable ::RingPiercing::namdbin] -row 1 -column 1 -sticky ew
     #grid [button $f.run.namdbutton -text "Browse" \
     #    -command {
     #        set tempfile [tk_getOpenFile -title "Select NAMD executable"]
-    #        if {![string equal $tempfile ""]} { set ::RPresolver::namdcommand $tempfile }
+    #        if {![string equal $tempfile ""]} { set ::RingPiercing::namdbin $tempfile }
     #    }] -row 1 -column 2 -sticky w
     foreach l {"label" "command" } {::TKTOOLTIP::balloon $f.run.namd${l} "Specify the path to NAMD executable."}
-    #variable namdcommandOpt "-gpu +p[::RPresolver::getProcs]"
-    variable namdcommandOpt "+idlepoll +setcpuaffinity +p[::RPresolver::getProcs]"
+    #variable namdargs "-gpu +p[::RingPiercing::getProcs]"
+    variable namdargs "+idlepoll +setcpuaffinity +p[::RingPiercing::getProcs]"
     grid [label  $f.run.namdlabelOpt -text "NAMD options:"] -row 2 -column 0 -sticky w
-    grid [entry  $f.run.namdcommandOpt -width 30 -textvariable ::RPresolver::namdcommandOpt] -row 2 -column 1 -columnspan 2 -sticky ew
-    foreach l {"labelOpt" "commandOpt"} {::TKTOOLTIP::balloon $f.run.namd${l} "Specify options used to run NAMD."}
+    grid [entry  $f.run.namdargs -width 30 -textvariable ::RingPiercing::namdargs] -row 2 -column 1 -columnspan 2 -sticky ew
+    foreach l {"labelOpt" "namdargs"} {::TKTOOLTIP::balloon $f.run.namd${l} "Specify options used to run NAMD."}
     grid columnconfigure $f.run 1 -weight 1 -minsize 55
 
     grid [button $f.button1 -text "RUN NOW!" -width 20 -state normal \
-    -command {set ::RPresolver::BuildScript 0; ::RPresolver::run_exchange}]  -row 6 -column 0 -padx 4 -pady 4 -sticky we
+    -command {set ::RingPiercing::BuildScript 0; ::RingPiercing::run_exchange}]  -row 6 -column 0 -padx 4 -pady 4 -sticky we
     ::TKTOOLTIP::balloon $f.button1 "Start membrane generation in current VMD session."
     grid [button $f.button2 -text "Build script" -width 20 -state normal \
-    -command {set ::RPresolver::BuildScript 1; ::RPresolver::prepareRunScript}]  -row 7 -column 0 -padx 4 -pady 4 -sticky we
+    -command {set ::RingPiercing::BuildScript 1; ::RingPiercing::prepareRunScript}]  -row 7 -column 0 -padx 4 -pady 4 -sticky we
     ::TKTOOLTIP::balloon $f.button2 "Prepare script to run Membrane Mixer later.\nThis is particularly useful if one wants to\nrun in another computer or in a cluster."
     
     
@@ -343,255 +263,53 @@ variable psffile
     
     
     return $w
-}
+#}
+#UNCOMMENT HERE
 
-### OTHER PROCEDURES ###
-proc ::RPresolver::getProcs {} {
-    global tcl_platform env
-    if {$::tcl_platform(os) == "Darwin"} {
-        catch {exec sysctl -n hw.ncpu} proce
-        return $proce
-    } elseif {$::tcl_platform(os) == "Linux"} {
-        catch {exec grep -c "model name" /proc/cpuinfo} proce
-        return $proce
-    } elseif {[string first "Windows" $::tcl_platform(os)] != -1} {
-        catch {HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\CentralProcessor } proce
-        set proce [llength $proce]
-        return $proce
-    }
-}
 
-# proc ::RPresolver::init_default_topology {} {
-#     global env
-#     variable parfiles
-#     variable casesen
-#     lappend parfiles [file join $env(CHARMMTOPDIR) top_all27_prot_lipid_na.inp]
-# }
-#
-proc ::RPresolver::psffileCheck {args} {
+proc ::RingPiercing::psffileCheck {args} {
     variable w
-     set test_var [string trim $::RPresolver::psffile]
+     set test_var [string trim $::RingPiercing::psffile]
      if {$test_var eq ""} {
-        $w.input.psfpath configure -background HotPink2
+        $w.input.psfpath configure -background tomato
      } else {
         $w.input.psfpath configure -background white
      }
 }
 
-proc ::RPresolver::pdbfileCheck {args} {
+proc ::RingPiercing::pdbfileCheck {args} {
     variable w
-     set test_var [string trim $::RPresolver::pdbfile]
+     set test_var [string trim $::RingPiercing::pdbfile]
      if {$test_var eq ""} {
-        $w.input.pdbpath configure -background HotPink2
+        $w.input.pdbpath configure -background tomato
      } else {
         $w.input.pdbpath configure -background white
      }
 }
 
-proc ::RPresolver::conffileCheck {args} {
+proc ::RingPiercing::conffileCheck {args} {
     variable w
-     set test_var [string trim $::RPresolver::conffile]
+     set test_var [string trim $::RingPiercing::conffile]
      if {$test_var eq ""} {
-        $w.input.confpath configure -background HotPink2
+        $w.input.confpath configure -background tomato
      } else {
         $w.input.confpath configure -background white
      }
 }
 
-proc ::RPresolver::outputpathCheck {args} {
+proc ::RingPiercing::outputpathCheck {args} {
     variable w
-     set test_var [string trim $::RPresolver::outputpath]
+     set test_var [string trim $::RingPiercing::outputpath]
      if {$test_var eq ""} {
-        $w.input.outputpath configure -background HotPink2
+        $w.input.outputpath configure -background tomato
      } else {
         $w.input.outputpath configure -background white
      }
 }
 
-proc ::RPresolver::lselectionCheck {args} {
+proc ::RingPiercing::write_state_1 {args} {
     variable w
-     set test_var [string trim $::RPresolver::lselection]
-     if {$test_var eq ""} {
-        $w.selection.lselection configure -background HotPink2
-     } else {
-        $w.selection.lselection configure -background white
-     }
-}
-
-proc ::RPresolver::forceconstbilayerCheck {args} {
-    variable w
-     set test_var [string trim $::RPresolver::forceconstbilayer]
-     if {![string is double $test_var] || $test_var < 0} {
-        $w.selection.forceconstbilayer configure -background HotPink2
-     } else {
-        $w.selection.forceconstbilayer configure -background white
-     }
-}
-
-proc ::RPresolver::forceconstCheck {args} {
-    variable w
-     set test_var [string trim $::RPresolver::forceconst]
-     if {![string is double $test_var] || $test_var < 0} {
-        $w.selection.forceconst configure -background HotPink2
-     } else {
-        $w.selection.forceconst configure -background white
-     }
-}
-
-proc ::RPresolver::restrainedselectionCheck {args} {
-    variable w
-     set test_var [string trim $::RPresolver::restrainedselection]
-     if {$test_var eq ""} {
-        $w.selection.restrainedselection configure -background HotPink2
-     } else {
-        $w.selection.restrainedselection configure -background white
-     }
-}
-
-proc ::RPresolver::exchangeCheck {args} {
-    variable w
-     set test_var [string trim $::RPresolver::exchange]
-     if {![string is double $test_var] || $test_var <= 0 || $test_var > 100} {
-        $w.parameters.exchange configure -background HotPink2
-     } else {
-        $w.parameters.exchange configure -background white
-     }
-}
-
-proc ::RPresolver::nreplicasCheck {args} {
-    variable w
-     set test_var [string trim $::RPresolver::nreplicas]
-     if {![string is integer $test_var] || $test_var <= 0} {
-        $w.parameters.nreplicas configure -background HotPink2
-     } else {
-        $w.parameters.nreplicas configure -background white
-     }
-}
-
-proc ::RPresolver::min1Check {args} {
-    variable w
-     set test_var [string trim $::RPresolver::num_min1]
-     if {![string is integer $test_var] || $test_var < 0} {
-        $w.moldyn.num_min1 configure -background HotPink2
-     } else {
-        $w.moldyn.num_min1 configure -background white
-     }
-}
-
-proc ::RPresolver::min2Check {args} {
-    variable w
-     set test_var [string trim $::RPresolver::num_min2]
-     if {![string is integer $test_var] || $test_var < 0} {
-        $w.moldyn.num_min2 configure -background HotPink2
-     } else {
-        $w.moldyn.num_min2 configure -background white
-     }
-}
-
-proc ::RPresolver::md1Check {args} {
-    variable w
-     set test_var [string trim $::RPresolver::num_md1]
-     if {![string is integer $test_var] || $test_var < 0} {
-        $w.moldyn.num_md1 configure -background HotPink2
-     } else {
-        $w.moldyn.num_md1 configure -background white
-     }
-}
-
-proc ::RPresolver::md2Check {args} {
-    variable w
-     set test_var [string trim $::RPresolver::num_md2]
-     if {![string is integer $test_var] || $test_var < 0} {
-        $w.moldyn.num_md2 configure -background HotPink2
-     } else {
-        $w.moldyn.num_md2 configure -background white
-     }
-}
-
-proc ::RPresolver::namdcommandCheck {args} {
-    variable w
-     set test_var [string trim $::RPresolver::namdcommand]
-     if {$test_var eq ""} {
-        $w.run.namdcommand configure -background HotPink2
-     } else {
-        $w.run.namdcommand configure -background white
-     }
-}
-
-proc ::RPresolver::MoveScrollbar args {
-    variable w
-    #puts "yset args: $args"
-    #puts "Scrollbar: [linsert $args 0 $iW.data.scrbar set]"
-    eval [linsert $args 0 $w.console.scrbar set]
-    [namespace current]::SetScollbar moveto [lindex [$w.console.scrbar get] 0]
-}
-
-proc ::RPresolver::SetScollbar args {
-    variable iResListboxArray
-    foreach name [array names iResListboxArray] {
-      eval [linsert $args 0 $iResListboxArray($name) yview]
-    }
-  
-}
-
-proc ::RPresolver::UpdateStatusText { statusText } {
-    variable w
-    set path $w.statusbar.label
-    $path configure -text $statusText
-    update
-}
-
-proc ::RPresolver::UpdateStateRun { state } {
-    variable w
-    set path1 $w.button1
-    $path1 configure -state ${state}
-    set path2 $w.button2
-    $path2 configure -state ${state}
-    update
-}
-
-proc ::RPresolver::consoleMessage { desc } {
-    # send a message to the console
-    variable w
-    # lookup and format some data
-    set count [format "%03d" $::RPresolver::consoleMessageCount]
-    #set timestamp [clock format [clock seconds] -format {%m/%d/%Y- %I:%M:%S %p}]
-    set timestamp [clock format [clock seconds] -format {%I:%M:%S %p}]
-
-    # write the message to the console
-    $w.console.log insert {} 0 -values [list $count $desc $timestamp]
-
-    # increment the count
-    incr ::RPresolver::consoleMessageCount
-
-    # if number of messages exceeds max, remove last node
-    # this is important to prevent taking too much memory
-    set itemList [$w.console.log children {}]
-    if { [llength $itemList] > $::RPresolver::consoleMaxHistory } {
-            $w.console.log delete [lindex $itemList end]
-    }
-}
-
-proc ::RPresolver::write_state {args} {
-    variable w
-    if {$::RPresolver::restrained == 0} {
-    	$w.selection.restrainedselection configure  -state disabled
-    	$w.selection.forceconst configure      -state disabled
-    	$w.selection.forceconstlabel configure -state disabled
-    	$w.selection.restrainedselectionlabel configure -state disabled
-    
-    } else {
-    	$w.selection.restrainedselection configure  -state normal
-    	$w.selection.forceconst configure      -state normal
-    	$w.selection.forceconstlabel configure -state normal
-    	$w.selection.restrainedselectionlabel configure -state normal
-    
-    }
-}
-
-proc ::RPresolver::write_state_1 {args} {
-    variable w
-    if {$::RPresolver::custom_conffile == 0} {
+    if {$::RingPiercing::custom_conffile == 0} {
     	$w.input.conflabel  configure -state disabled
     	$w.input.confpath   configure -state disabled
     	$w.input.confbutton configure -state disabled
@@ -603,173 +321,8 @@ proc ::RPresolver::write_state_1 {args} {
     }
 }
 
-proc ::RPresolver::write_state_2 {args} {
-    variable w
-    if {$::RPresolver::restrainedbilayer == 0} {
-    	$w.selection.forceconstbilayerlabel  configure -state disabled
-    	$w.selection.forceconstbilayer   configure -state disabled
-    
-    } else {
-    	$w.selection.forceconstbilayerlabel  configure -state normal
-    	$w.selection.forceconstbilayer   configure -state normal
-    }
-}
-
-proc ::RPresolver::ErrorMessCheck {TEXT} {
-    puts "$TEXT"
-    ::RPresolver::UpdateStatusText "IDLE"
-    ::RPresolver::consoleMessage "ERROR DETECTED!"
-    tk_messageBox -type ok -icon error -message "Action halted on error!" -detail "$TEXT" 
-    ::RPresolver::UpdateStateRun normal
-    return -level 3
-}
-
-proc ::RPresolver::ErrorMessWarn {TEXT} {
-    puts "$TEXT"
-    ::RPresolver::consoleMessage "WARNING!"
-    set answer [tk_messageBox -type yesno -icon warning -message "Warning!" -detail [concat $TEXT "\n Are you sure you want to continue?"]]
-    case $answer {
-	no  {
-	    ::RPresolver::UpdateStatusText "IDLE"
-	    ::RPresolver::UpdateStateRun normal
-	    return -level 3
-	    }
-        yes {return} 
-    }
-}
-
-proc ::RPresolver::ErrorMessRun {TEXT} {
-    variable ::RPresolver::BuildScript
-    puts2 "$TEXT"
-    if {!$::RPresolver::BuildScript} {::RPresolver::consoleMessage "ERROR DETECTED! SKIP THIS REPLICA!"}
-    return 1
-}
-
-proc ::RPresolver::puts2 {TEXT} {
-    # Write some message to tk console and to progress file
-    puts $TEXT
-    set OUT [open $::RPresolver::progressFile a]
-    puts $OUT $TEXT
-    close $OUT
-}
-
-proc ::RPresolver::puts3 {opt TEXT} {
-    # Write some message to tk console and to progress file
-    puts $opt $TEXT
-    set OUT [open $::RPresolver::progressFile a]
-    puts $opt $OUT $TEXT
-    close $OUT
-}
-
-# Procedure to write text into a file
-proc ::RPresolver::TextWrite {FILE TEXT} {
-    set out [open $FILE w]
-    puts $out $TEXT
-    close $out
-}
-
-# Procedure to append text into a file
-proc ::RPresolver::TextAppend {FILE TEXT} {
-    set out [open $FILE a]
-    puts $out $TEXT
-    close $out
-}
-
-# Procedure to append content of a file into another file
-proc ::RPresolver::FileAppend {FILEIN FILEOUT} {
-    set out [open $FILEOUT a]
-    set in  [open $FILEIN r]
-    while { ![eof $in] } {
-        set inLine [gets $in]
-        puts $out $inLine
-    }
-    close $out
-    close $in
-}
-
-# Procedure that emulates GREP
-proc ::RPresolver::GrepEmu {pattern FILE begin} {
-    # if begin == 1 then search pattern from beginning of line
-    if {$begin} {
-	set search "^$pattern"
-    } else {
-	set search "$pattern"
-    }
-    set line 1
-    # Open require file to search pattern
-    set fileID [open $FILE r]
-    
-    # This loop will get each line from given fileID, using regexp we search given pattern
-    # on that line, displayed with corresponding line number and pattern on that line
-    set match ""    
-    set ind 0
-    while { ![eof $fileID] } {
-        gets $fileID content
-	set trimmed [string trim $content]
-        set res [regexp -nocase $search $trimmed]
-        if {$res >= 1} {
-	    set match $trimmed
-	    set ind 1
-        }
-        incr line
-    }
-    close $fileID
-    return [list $match $ind]
-}
-
-# Procedure to remove lines matching with patterns starting at the beginning of the line
-proc ::RPresolver::WriteRemoveLines {lisPattern FILE FILETMP} {
-    # Open file
-    set FILEIN [open $FILE r]
-    set OUT [open $FILETMP w]
-    # This loop will get each line from given FILE.
-    # If a line matches the patter it is not written to the file
-    gets $FILEIN content
-    while { ![eof $FILEIN] } {
-        set trimmed [string trim $content]
-	set WriteLine 1
-	foreach p $lisPattern {
-            set res [regexp -nocase "^$p" $trimmed]
-            if {$res} {
-		set WriteLine 0
-	    }
-        }
-	if {$WriteLine} {
-	    puts $OUT $content
-	}
-        gets $FILEIN content
-    }
-    close $FILEIN
-    close $OUT
-    file copy -force $FILETMP $FILE
-}
-
-# Procedure to replace a line after matching a pattern at the beginning of the line
-proc ::RPresolver::WriteReplaceLine {Pattern NewLine FILE FILETMP} {
-    # Open file
-    set FILEIN [open $FILE r]
-    set OUT [open $FILETMP w]
-    # This loop will get each line from given FILE.
-    # If a line matches the patter it will be replaced by the NewLine
-    gets $FILEIN content
-    while { ![eof $FILEIN] } {
-        set trimmed [string trim $content]
-        set res [regexp -nocase "^$Pattern" $trimmed]
-        if {$res} {
-            puts $OUT $NewLine
-        } else {
-            puts $OUT $content
-	}
-        gets $FILEIN content
-    }
-    close $FILEIN
-    close $OUT
-    file copy -force $FILETMP $FILE
-}
-
-
 # Procedure to add representation for piercing atoms
-proc ::RPresolver::add_rep_piercing {ser molid} {
+proc ::RingPiercing::add_rep_piercing {ser molid} {
     mol color Name
     mol representation VDW 0.8 12.0
     mol selection "serial $ser"
@@ -782,1180 +335,124 @@ proc ::RPresolver::add_rep_piercing {ser molid} {
     mol addrep $molid
 }
 
-# Procedure to set some representations
-proc ::RPresolver::add_rep_all {molid sel} {
-#    color Display Background white
-#    display nearclip set 0.0000
-    mol showrep $molid 0 off
-    mol color Resname
-    mol selection $sel
-    mol addrep $molid
-    # Add representation for protein if present
-    if {[[atomselect $molid "protein"] num]} {
-        mol color segname
-        mol representation NewCartoon
-        mol selection "protein"
-        mol addrep $molid
-    }
-}
-
-# Procedure add representation for lipid residues
-proc ::RPresolver::add_rep_lipid {molid sel res} {
-    mol color ResID
-    mol representation Licorice 0.3 12.0 12.0
-    mol selection "$sel and resid $res"
-    mol material Opaque
-    mol addrep $molid
-}
-
-# Procedure to check if there is ring piercing atoms
-proc ::RPresolver::CheckPiercing {id psf checkcutoff} {
-    set listpiercing {}
-    # Open psf file to read bond pairs
-    set INP [open $psf r]
-    set line [gets $INP]
-    while { ![string match -nocase "*NBOND: bonds*" $line] } {
-        set line [gets $INP]
-    }
-    set checkbond $checkcutoff
-    while { ![string match -nocase "" $line] } {
-        set line [gets $INP]
-        for {set i 1} {$i<=[expr [llength $line]/2]} {incr i} {
-            set b [measure bond [list [list [expr [lindex $line [expr $i*2-2]] - 1] $id]  [list [expr [lindex $line [expr $i*2-1]] - 1] $id] ]]
-            if {$b>$checkbond && $b<15} {
-                lappend listpiercing [list [lindex $line [expr $i*2-2]]  [lindex $line [expr $i*2-1]]]
-                puts2 "   Bond between serial [lindex $line [expr $i*2-2]]  [lindex $line [expr $i*2-1]] is [format %.3f $b]: probable ring piercing."
-
-            }
-        }
-    }
-    close $INP
-    if {![llength $listpiercing]} {puts2 "* No ring piercing with cutoff $checkcutoff Ang *"; return}
-    # Check if there is a disulfide bond, which might have a bond longer than 2.0 A. Remove from the list in that case.
-    set listfinal1 {}
-    for {set i 0} {$i<[llength $listpiercing]} {incr i} {
-        if {[string trim [[atomselect $id "serial [lindex $listpiercing $i 0]"] get type]] eq "SM" && [string trim [[atomselect $id "serial [lindex $listpiercing $i 1]"] get type]] eq "SM"} {
-            puts2 "      Skipping serial [lindex $listpiercing $i 0]  [lindex $listpiercing $i 1] (atom type \"SM\"), it is a disulfide bond."
-        } else {
-            lappend listfinal1 [lindex $listpiercing $i]
-        }
-    }
-    # Only select longer bond to move if there are many bonds related to the same ring piercing.
-    # There might still be a problem if P-O bonds are piercing.
-    set cent {} ;# calculate center of each bond
-    for {set i 0} {$i<[llength $listfinal1]} {incr i} {
-        lappend cent [measure center [atomselect $id "serial [lindex $listfinal1 $i 0] [lindex $listfinal1 $i 1]"]]
-    }
-    set Num [llength $cent]
-    set group {}
-    for {set i 0} {$i<$Num} {incr i} {
-        lappend group "None"
-    }
-    set g 0
-    for {set i 0} {$i<$Num} {incr i} {
-        if {[lindex $group $i] ne "None"} {
-            continue
-        } else {
-            set group [lreplace $group $i $i $g]
-            set g [expr $g + 1]
-        }
-        unset -nocomplain dist
-        for {set j 0} {$j<$Num} {incr j} {
-               set dist($j) [vecdist [lindex $cent $i] [lindex $cent $j]]
-        }
-        for {set j 0} {$j<$Num} {incr j} {
-            if {[expr abs($dist($i) - $dist($j))]<4.0} {
-                set group [lreplace $group $j $j [lindex $group $i]]
-            } 
-         }   
-    }
-    # Find number of groups
-    set NGroups [llength [lsort -unique $group]]
-    # Make list with serial numbers subdivided by groups
-    set lisGroups {}
-    for {set i 0} {$i<$NGroups} {incr i} {
-        lappend lisGroups {}
-    }
-    proc sub_lappend {listname idx args} {
-        upvar 1 $listname l
-        set subl [lindex $l $idx]
-        lappend subl {*}$args
-        lset l $idx $subl
-    }
-    for {set i 0} {$i<$NGroups} {incr i} {
-        for {set j 0} {$j<$Num} {incr j} {
-            if {[lindex $group $j] == $i } {
-                sub_lappend lisGroups $i [lindex $listfinal1 $j]
-            }
-        }
-    }
-    set listfinal2 {}
-    for {set i 0} {$i<$NGroups} {incr i} {
-        set tempMax 0
-        set indMax 0
-        for {set j 0} {$j<[llength [lindex $lisGroups $i]]} {incr j} {
-            set d [measure bond [list [list [expr [lindex $lisGroups $i $j 0] - 1] $id]  [list [expr [lindex $lisGroups $i $j 1] - 1] $id] ]]
-            if {$d>$tempMax} {
-                set tempMax $d
-                set indMax $j
-            }
-        }
-        lappend listfinal2 [lindex $lisGroups $i $indMax]
-    }
-    for {set i 0} {$i<[llength $listfinal2]} {incr i} {
-        puts2 "   Bond between serial [lindex $listfinal2 $i 0]  [lindex $listfinal2 $i 1] is a ring piercing and will be fixed in next simulation."
-    }
-    if {![llength $listfinal2]} {puts2 "* No ring piercing with cutoff $checkcutoff Ang *"}
-    return $listfinal2
-}
-
-# Get total amount of lipids in membrane
-proc ::RPresolver::GetLeafLipids {ID sel} {
-    set AllLipID [lsort -unique -integer [[atomselect $ID $sel] get resid]]
-    set NumLipTot [llength $AllLipID]
-    # Get resid of lipids in each leaflet
-    set Leaf1 {}
-    set Leaf2 {}
-    set membrange [measure minmax [atomselect $ID $sel]]
-    set membZcenter [expr ([lindex $membrange 1 2] + [lindex $membrange 0 2])/2 ]
-    foreach res $AllLipID {
-        set comtmp [measure center [atomselect $ID "$sel and resid $res"] weight mass]
-        if {[lindex $comtmp 2] >= $membZcenter} {
-            lappend Leaf1 $res
-        } else {
-            lappend Leaf2 $res
-        }
-    }
-    return [list $Leaf1 $Leaf2 $membZcenter]
-}
-
-# Procedure to get the lipids to exchange.
-# Resid in list "li" will be exchanged pairwise with those in list "lf".
-proc ::RPresolver::get_res_leaflet {N lA} {
-    set li {}
-    set lf {}
-    for {set i 0} {$i<[expr $N/2]} {incr i} {
-        set randnum [expr int(rand()*[llength $lA])]
-        set resid [lindex $lA $randnum]
-        lappend li $resid
-        set lA [lreplace $lA $randnum $randnum]
-        set randnum [expr int(rand()*[llength $lA])]
-        set resid [lindex $lA $randnum]
-        lappend lf $resid
-        set lA [lreplace $lA $randnum $randnum]
-    }
-    return [list $li $lf]
-}
-
-# Procedure to move the two atoms (and the atoms directly bound to them) away from the ring
-proc ::RPresolver::MovePiercing {ind1 ind2 molid c} {
-    set a1 [atomselect $molid "index $ind1"]
-    set a2 [atomselect $molid "index $ind2"]
-    set ax [vecsub [lindex [$a2 get {x y z}] 0] [lindex [$a1 get {x y z}] 0]]; # vector defined by piercing atoms
-    # Set a vector perpendiculat to "ax" using either the X or Y axis (choose randomly)
-    if {[expr round(rand())]} {
-        set norm1 [vecnorm [veccross $ax {1 0 0}]]
-    } else {
-        set norm1 [vecnorm [veccross $ax {0 1 0}]]
-    }
-    set norm2 [vecnorm [veccross $ax $norm1]]; # move atoms along this vector
-    set listbonded [[atomselect $molid "serial $ind1 $ind2"] getbonds]
-    # Move the group of piercing atoms in the positive or negative direction (choose randomly) by a certain amount
-    if {$c<=5} {
-        set step 3.0
-    } elseif {$c>=10} {
-        set step 3.4
-    } else {
-        set step 3.2
-    }
-    if {[expr round(rand())]} {
-        set movestep -$step
-    } else {
-        set movestep $step
-    }
-    foreach i [lindex $listbonded 0] {
-        display update ui
-        [atomselect $molid "index $i"] moveby [vecscale $movestep $norm2]
-    }
-    foreach i [lindex $listbonded 1] {
-        display update ui
-        [atomselect $molid "index $i"] moveby [vecscale $movestep $norm2]
-    }
-}
-
-# Procedure to add colvar to .col file
-proc ::RPresolver::AddColvar {inp name sel Z force} {
-    puts $inp "colvar {"
-    puts $inp "   name $name"
-    puts $inp "   distanceZ {"
-    puts $inp "      main {"
-    puts $inp "         atomnumbers { [$sel get serial] }"
-    puts $inp "      }"
-    puts $inp "      ref {"
-    puts $inp "         dummyAtom ( 0.000, 0.000, 0.000 )"
-    puts $inp "      }"
-    puts $inp "   }"
-    puts $inp "}"
-    puts $inp "harmonic {"
-    puts $inp "   colvars $name"
-    puts $inp "   centers       [format %.2f $Z]"
-    puts $inp "   forceConstant $force"
-    puts $inp "}"
-}
-
-# Procedure to exchange full center of mass or only XY (keep same Z) of the two lipids
-proc ::RPresolver::exchange_com {id sel res1 res2 ExProc} {
-    set com1 [measure center [atomselect $id "$sel and resid $res1"] weight mass]
-    set com2 [measure center [atomselect $id "$sel and resid $res2"] weight mass]
-    set vec1 [vecsub $com2 $com1]
-    set vec2 [vecsub $com1 $com2]
-    if {$ExProc} {
-        [atomselect $id "$sel and resid $res1"] moveby [list [lindex $vec1 0] [lindex $vec1 1] 0 ]
-        [atomselect $id "$sel and resid $res2"] moveby [list [lindex $vec2 0] [lindex $vec2 1] 0 ]
-    } else {
-        [atomselect $id "$sel and resid $res1"] moveby $vec1
-        [atomselect $id "$sel and resid $res2"] moveby $vec2
-    }
-}
-
-# Procedure to start and follow a NAMD simulation run
-proc ::RPresolver::StartFollowNAMD {root conf NAMDPATH OPTS} {
-    file delete ${root}.log
-    eval ::ExecTool::exec \"${NAMDPATH}\" ${OPTS} \"${conf}\" > \"${root}.log\" &
-    after 2000
-    # Wait until the simulation is done
-    set control [lindex [::RPresolver::GrepEmu "End of program" ${root}.log 0] 1]
-    puts3 -nonewline  "Waiting for NAMD job to finish..."
-    set c 0
-    while {!$control} {
-        display update ui
-        after 20
-        incr c
-        if {[expr {($c % 150) == 0}]} {
-            puts3 -nonewline "."
-            set control [lindex [::RPresolver::GrepEmu "End of program" ${root}.log 0] 1]
-            set control2 [lindex [::RPresolver::GrepEmu "FATAL ERROR" ${root}.log 0] 1]
-            # Check if fatal errors
-            if {$control2} {
-		set SKIPREP [::RPresolver::ErrorMessRun "   A FATAL ERROR occurred during NAMD job! SKIPPING THIS REPLICA!"]
-		return $SKIPREP
-            }
-        }
-    }
-    puts2 "Done."
-    display update ui
-    # Check if errors were found during simulations (e.g. Constraint failure)
-    set control3 [lindex [::RPresolver::GrepEmu "ERROR:" ${root}.log 0] 1]
-    if {$control3} {
-        puts2 "   AN ERROR WAS REPORTED IN NAMD LOG FILE! It might be related to ring piercing and might be corrected in next equilibration."
-    }
-    return 0
-}
-
-proc ::RPresolver::WriteTMPConf {conftmp} {
-    set OUT [open $conftmp w]
-    puts $OUT "structure"
-    puts $OUT "coordinates"
-    puts $OUT "set temp           298"
-    puts $OUT "dcdfreq            100"
-    puts $OUT "outputEnergies     100"
-    puts $OUT "xstFreq            100"
-    puts $OUT "restartfreq        100"
-    puts $OUT "outputTiming       10000"
-    puts $OUT "paraTypeCharmm     on"
-    puts $OUT "set path $::RPresolver::dirCharmmPar"
-    puts $OUT "parameters         \$path/par_all36_prot.prm"
-    puts $OUT "parameters         \$path/par_all36_na.prm"
-    puts $OUT "parameters         \$path/par_all36_carb.prm"
-    puts $OUT "parameters         \$path/par_all36_lipid.prm"
-    puts $OUT "parameters         \$path/par_all36_cgenff.prm"
-    puts $OUT "parameters         \$path/toppar_water_ions_namd.str"
-    puts $OUT "parameters         \$path/toppar_all36_carb_glycopeptide.str"
-    puts $OUT "exclude            scaled1-4"
-    puts $OUT "1-4scaling         1.0"
-    puts $OUT "switching          on"
-    puts $OUT "vdwForceSwitching  yes"
-    puts $OUT "cutoff             12.0"
-    puts $OUT "switchdist         10.0"
-    puts $OUT "pairlistdist       16.0"
-    puts $OUT "stepspercycle      20"
-    puts $OUT "pairlistsPerCycle   2"
-    puts $OUT "timestep           1.0"
-    puts $OUT "rigidBonds         none"
-    puts $OUT "nonbondedFreq      1"
-    puts $OUT "fullElectFrequency 1"
-    puts $OUT "wrapWater          on"
-    puts $OUT "wrapAll            on"
-    puts $OUT "PME                yes"
-    puts $OUT "PMEInterpOrder     6"
-    puts $OUT "PMEGridSpacing     1.0"
-    puts $OUT "useGroupPressure       yes"
-    puts $OUT "useFlexibleCell        yes"
-    puts $OUT "useConstantRatio       yes"
-    puts $OUT "langevinPiston         on"
-    puts $OUT "langevinPistonTarget   1.01325"
-    puts $OUT "langevinPistonTemp     \$temp"
-    puts $OUT "langevin               on"
-    puts $OUT "langevinDamping        1.0"
-    puts $OUT "langevinTemp           \$temp"
-    puts $OUT "langevinHydrogen       off"
-    close $OUT
-}
-
-proc ::RPresolver::MakeConfFile {ID wd psf pdb xsc root num_min num_md PHASE indPhase numrepF restrainedbilayer MembSelection membZcenter forceconstbilayer restrained restrGroupSelect forceconst conftmp filetmp ROOTPSF ChangeFreqOut parfiles} {
-    variable ::RPresolver::BuildScript
-    # Make new input for simulation
-    puts2 "Prepare conf file for simulation..."
-    if {!$::RPresolver::BuildScript} {::RPresolver::consoleMessage "Prepare CONF file (EQ${indPhase}-R$numrepF)"}
-    set conf $root.conf
-    file delete $conf
-    if {$PHASE == "EQ1" || $PHASE == "RP"} {
-        set min $num_min
-        set md $num_md
-        puts2 "   * Will minimize for $min steps"
-        puts2 "   * Will run MD for $md steps"
-        if {!$::RPresolver::BuildScript} {::RPresolver::consoleMessage "MIN $min steps --> MD $md steps"}
-    } elseif {$PHASE == "EQ2"} {
-        set min $num_min
-        set md $num_md
-        puts2 "   * Will minimize for $min steps"
-        puts2 "   * Will run MD for $md steps with \"mgridforcescale\" of 4"
-        puts2 "   * Will run MD for $md steps with \"mgridforcescale\" of 3"
-        puts2 "   * Will run MD for $md steps with \"mgridforcescale\" of 2"
-        puts2 "   * Will run MD for $md steps with \"mgridforcescale\" of 1"
-        puts2 "   * Will run MD for [expr 2*$md] steps with \"mgridforcescale\" of 0"
-        if {!$::RPresolver::BuildScript} {::RPresolver::consoleMessage "MIN $min steps --> MD [expr 6*$md] steps"}
-    }
-    if {$PHASE == "EQ1" || $PHASE == "EQ2"} {
-	if {$::RPresolver::setGridForceOn} {
-	    ::RPresolver::TextWrite $conf "\# Setup the grid \nmgridforce              yes\nmgridforcefile          a MMP.FORCEGRID.REP${numrepF}.REF${indPhase}.pdb\nmgridforcecol           a O\nmgridforcechargecol     a B\nmgridforcepotfile       a MMP.FORCEGRID.REP${numrepF}.REF${indPhase}.dx\nmgridforcescale         a 10.0 10.0 10.0\nmgridforcechecksize     a off\n"
-	} else {
-	    ::RPresolver::TextWrite $conf "\# Setup the grid \nmgridforce              no\nmgridforcefile          a MMP.FORCEGRID.REP${numrepF}.REF${indPhase}.pdb\nmgridforcecol           a O\nmgridforcechargecol     a B\nmgridforcepotfile       a MMP.FORCEGRID.REP${numrepF}.REF${indPhase}.dx\nmgridforcescale         a 10.0 10.0 10.0\nmgridforcechecksize     a off\n"
-	}
-    }
-    if {$restrainedbilayer && [[atomselect $ID "$MembSelection and name P"] num]} {
-        # Make colvar file to restraints membrane phosphate-phosphate distance.
-        if {!$::RPresolver::BuildScript} {::RPresolver::consoleMessage "Restrain membrane (EQ${indPhase}-R$numrepF)"}
-        puts2 "Applying colvar to restrain membrane selection \"$MembSelection\""
-        ::RPresolver::TextAppend $conf "\# Setup colvar to restrain membrane. Same file for all simulations.\ncolvars                 on\ncolvarsConfig           MMP.${ROOTPSF}.REP${numrepF}.EQ1.col\n"
-        if {$PHASE == "EQ1"} {
-            puts2 "Applying colvar restraints on phosphorus of phospholipids in selection \"$MembSelection\""
-            set selP1 [atomselect $ID "$MembSelection and name P and z > $membZcenter"]
-            set selP2 [atomselect $ID "$MembSelection and name P and z < $membZcenter"]
-            set ZP1 [expr [lindex [measure center $selP1] 2] - $membZcenter]; # equilibrium value for distance in colvar, upper leaflet
-            set ZP2 [expr [lindex [measure center $selP2] 2] - $membZcenter]; # equilibrium value for distance in colvar, lower leaflet
-            set inpcol [open $root.col w]
-            puts $inpcol ""
-            puts $inpcol "Colvarstrajfrequency    [expr $min/2]"
-            puts $inpcol ""
-            ::RPresolver::AddColvar $inpcol "RestrPhosUpper" $selP1 $ZP1 $forceconstbilayer
-            ::RPresolver::AddColvar $inpcol "RestrPhosLower" $selP2 $ZP2 $forceconstbilayer
-            # Check if cholesterol is present and in that case add colvar to oxygen atom
-            if {[[atomselect $ID "resname CHL1"] num]} {
-                puts2 "Applying colvar restraints on oxygen of cholesterol in selection \"$MembSelection\""
-                set selC1 [atomselect $ID "$MembSelection and resname CHL1 and name O3 and z > $membZcenter"]
-                set selC2 [atomselect $ID "$MembSelection and resname CHL1 and name O3 and z < $membZcenter"]
-                set ZC1 [expr [lindex [measure center $selC1] 2] - $membZcenter]; # equilibrium value for distance in colvar, upper leaflet
-                set ZC2 [expr [lindex [measure center $selC2] 2] - $membZcenter]; # equilibrium value for distance in colvar, lower leaflet
-                ::RPresolver::AddColvar $inpcol "RestrCholUpper" $selC1 $ZC1 $forceconstbilayer
-                ::RPresolver::AddColvar $inpcol "RestrCholLower" $selC2 $ZC2 $forceconstbilayer
-            }
-            close $inpcol
-        }
-    } elseif {$restrainedbilayer && ![[atomselect $ID "$MembSelection and name P"] num]} {
-        if {!$::RPresolver::BuildScript} {::RPresolver::consoleMessage "WARNING: No phosphorous atoms in \"$MembSelection\"!"}
-        puts2 "WARNING: No phosphorous atoms found for \"$MembSelection\" selection! Not applying membrane restrain!"
-    }
-    if {$restrained && [[atomselect $ID "$restrGroupSelect"] num]} {
-        # Fix position of some group of atoms if requested. The equilibrium positionis are always that of the initial structure (EQ1)
-        puts2 "Restraining position of selection \"$restrGroupSelect\""
-        if {!$::RPresolver::BuildScript} {::RPresolver::consoleMessage "Restrain selection \"$restrGroupSelect\" (EQ${indPhase}-R$numrepF)"}
-        ::RPresolver::TextAppend $conf "\# Restraints. Same file for Equilibration 1 and 2.\nconstraints             on\nconsexp                 2\nconsref                 MMP.RESTRAIN.REP${numrepF}.REF1.pdb\nconskfile               MMP.RESTRAIN.REP${numrepF}.REF1.pdb\nconskcol                B\nconstraintScaling       1.0\n"
-        if {$PHASE == "EQ1"} {
-            # Write the pdb file only in Equilibration 1, as the same file will be used in later simulations
-            [atomselect $ID all] set occupancy 0
-            [atomselect $ID all] set beta 0
-            [atomselect $ID "$restrGroupSelect"] set beta $forceconst
-            [atomselect $ID all] writepdb [file join $wd MMP.RESTRAIN.REP${numrepF}.REF1.pdb]
-        }
-    } elseif {$restrained && ![[atomselect $ID "$restrGroupSelect"] num]} {
-        if {!$::RPresolver::BuildScript} {::RPresolver::consoleMessage "WARNING: No atoms found \"$restrGroupSelect\""}
-        puts2 "WARNING: No atoms found for \"$restrGroupSelect\" selection! Not applying group restrain!"
-    }
-    # Add other important settings in conf file
-    if {$ChangeFreqOut} {set freqEQ $ChangeFreqOut}
-    if {$PHASE == "EQ1"} {
-        ::RPresolver::TextAppend $conf "extendedsystem          ${xsc}\noutputname              [file tail ${root}]\ntemperature             300\nmargin                  4\nlangevinPistonPeriod    300.0\nlangevinPistonDecay     200.0\n"
-        if {$ChangeFreqOut} {::RPresolver::TextAppend $conf "dcdfreq                 ${freqEQ}\noutputEnergies          ${freqEQ}\nxstFreq         	${freqEQ}\nrestartfreq     	${freqEQ}\n"}
-        ::RPresolver::FileAppend $conftmp $conf
-	if {[llength $parfiles]} {::RPresolver::AddParFiles $conf $parfiles}
-        ::RPresolver::TextAppend $conf "minimize                $min\nrun                     $md\n"
-        ::RPresolver::WriteReplaceLine "coordinates" "coordinates             $pdb" $conf $filetmp
-    } elseif {$PHASE == "EQ2"} {
-	set eq1root MMP.${ROOTPSF}.REP${numrepF}.EQ1
-        ::RPresolver::TextAppend $conf "binvelocities           [file tail ${eq1root}].restart.vel\nextendedsystem          [file tail ${eq1root}].restart.xsc\noutputname              [file tail ${root}]\nmargin                  4\nlangevinPistonPeriod    300.0\nlangevinPistonDecay     200.0\n"
-        if {$ChangeFreqOut} {::RPresolver::TextAppend $conf "dcdfreq                 ${freqEQ}\noutputEnergies          ${freqEQ}\nxstFreq         	${freqEQ}\nrestartfreq     	${freqEQ}\n"}
-        ::RPresolver::FileAppend $conftmp $conf
-	if {[llength $parfiles]} {::RPresolver::AddParFiles $conf $parfiles}
-	if {$::RPresolver::setGridForceOn} {
-            ::RPresolver::TextAppend $conf "minimize                $min\nset scale 5\nfor {set i 0} {\$i<5} {incr i} {\n    set scale \[expr \$scale - 1\]\n    updateGridScale     a \$scale \$scale \$scale\n    run                 $md\n}\nupdateGridScale     a 0 0 0\nrun                 $md\n"
-	} else {
-            ::RPresolver::TextAppend $conf "minimize                $min\nset scale 5\nfor {set i 0} {\$i<5} {incr i} {\n    set scale \[expr \$scale - 1\]\n    #Continue\n    run                 $md\n}\nrun                 $md\n"
-	}
-        ::RPresolver::WriteReplaceLine "coordinates" "coordinates             MMP.FORCEGRID.REP${numrepF}.REF2.pdb" $conf $filetmp
-    } elseif {$PHASE == "RP"} {
-        set restroot MMP.${ROOTPSF}.REP${numrepF}.EQ[expr ${indPhase} - 1]
-        ::RPresolver::TextAppend $conf "binvelocities           ${restroot}.restart.vel\nextendedsystem          ${restroot}.restart.xsc\noutputname              [file tail ${root}]\nmargin                  4\nlangevinPistonPeriod    300.0\nlangevinPistonDecay     200.0\n"
-        if {$ChangeFreqOut} {::RPresolver::TextAppend $conf "dcdfreq                 ${freqEQ}\noutputEnergies          ${freqEQ}\nxstFreq         	${freqEQ}\nrestartfreq     	${freqEQ}\n"}
-        ::RPresolver::FileAppend $conftmp $conf
-	if {[llength $parfiles]} {::RPresolver::AddParFiles $conf $parfiles}
-        ::RPresolver::TextAppend $conf "minimize                $min\nrun                     $md\n"
-	[atomselect $ID all] writepdb [file join $wd MMP.COORD.REP${numrepF}.REF${indPhase}.pdb]
-        ::RPresolver::WriteReplaceLine "coordinates" "coordinates             MMP.COORD.REP${numrepF}.REF${indPhase}.pdb" $conf $filetmp
-    }
-    ::RPresolver::WriteReplaceLine "structure" "structure               $psf" $conf $filetmp
-    return $conf
-}
-
-proc ::RPresolver::AddParFiles {conf parfiles} {
-    ::RPresolver::TextAppend $conf "# Additional parameter files"
-    for {set i 0} {$i<[llength $parfiles]} {incr i} {
-	::RPresolver::TextAppend $conf "parameters              [lindex $parfiles $i]"
-    }
-}
-
-proc ::RPresolver::MoveSimulationFiles {DIR TAG REP} {
-    # Move files into the proper directory after simulation.
-    set lisFileMove {}
-    cd [file dirname $DIR]
-    foreach NAME [list "$TAG" "MMP.FORCEGRID.REP${REP}" "MMP.COORD.REP${REP}" "MMP.RESTRAIN.REP${REP}"] {
-        if {![catch {glob -type f ${NAME}*}]} {
-            set lisTMP [glob -type f ${NAME}*]
-            set lisFileMove [concat $lisFileMove $lisTMP]
-        }
-    }
-    if {[llength $lisFileMove]} {
-        file mkdir $DIR
-        foreach f $lisFileMove {
-            file rename -force $f $DIR
-        }
-    }
-}
-
-proc ::RPresolver::GuessLipidSel {} {
-        set psf  $::RPresolver::psffile
-        set pdb  $::RPresolver::pdbfile
-        # Checking initial settings and files
-        ::RPresolver::UpdateStatusText "Guess lipid selection"
-        ::RPresolver::consoleMessage "Guess lipid selection"
-	# Check if PSF and PDB exist
-        foreach f [list $psf $pdb] tag [list "PSF file" "PDB file"] {
-            if {[string trim $f] eq ""} {
-                ::RPresolver::ErrorMessCheck "Error: \"$tag\" variable is empty!"
-            }
-        }
-        foreach f [list $psf $pdb] tag [list "PSF file" "PDB file"] {
-            if {[file exists $f] == 0} {
-                    ::RPresolver::ErrorMessCheck "Error: \"$tag\" does not exist!"
-            }
-        }
-        # Load molecular system
-        mol new $psf
-        mol addfile $pdb
-        set ID [molinfo top]
-	# Check if molecule was correctly loaded
-	if {![molinfo $ID get numframes]} {
-            ::RPresolver::ErrorMessCheck "Something is wrong with your structure!\nNo loaded molecule."
-	}
-	# Find possible lipids
-	set RESLIP "resname DLPE DMPC DPPC GPC LPPC PALM PGCL POPC POPE DOPC CHL1 PSM POPA DPPA DSPA DMPA DLPA PLPA SOPA SLPA DYPA YOPA DOPA DGPA DEPA DNPA \
-			    LLPA DDPC DCPC DLPC DSPC PSPC PLPC PAPC SOPC SLPC DRPC DYPC YOPC DUPC DGPC DEPC DNPC DLIPC LLPC DMPE DPPE DSPE PYPE DSPG PYPG \
-			    PLPE SOPE SLPE DYPE YOPE OYPE DOPE DGPE DEPE DNPE DLIPE LLPE DLPG DMPG DPPG POPG PLPG SOPG SLPG DYPG DOPG DGPG DEPG DNPG DLPS \
-			    DMPS DPPS DSPS POPS PLPS SOPS SLPS OLPS DYPS TOPS DOPS DGPS DEPS DNPS LLPS POPP1 POPP2 POPP3 DOPP1 DOPP2 DOPP3 DMPI DMPI13 DMPI14 \
-			    DMPI15 DMPI24 DMPI25 DMPI2A DMPI2B DMPI2C DMPI2D DMPI33 DMPI34 DMPI35 PYPI POPI POPI13 POPI14 POPI15 POPI24 POPI25 POPI2A POPI2B \
-			    POPI2C POPI2D POPI33 POPI34 POPI35 PLPI PLPI13 PLPI14 PLPI15 PLPI24 PLPI2A PLPI2B PLPI2C PLPI2D PLPI33 PLPI34 PLPI35 PNPI PNPI13 \
-   			    PNPI14 PNPI15 PNPI24 PNPI25 PNPI2A PNPI2B PNPI2C PNPI2D PNPI33 PNPI34 PNPI35 SAPI SAPI13 SAPI14 SAPI15 SAPI24 SAPI25 SAPI2A SAPI2B \
-			    SAPI2C SAPI2D SAPI33 SAPI34 SAPI35 DLIPI TMCL1 TMCL2 PMCL1 PMCL2 PVCL2 TYCL1 TYCL2 TOCL1 TOCL2 LOACL1 LOACL2 LOCCL1 LOCCL2 TLCL1 \
-			    TLCL2 LNCCL1 LNCCL2 LNACL1 LNACL2 LNDCL1 LNDCL2 LNBCL1 LNBCL2 DMTAP DPTAP DOTAP DSTAP PDOPC PDOPE SAPA SAPC SAPE SAPG SAPS SDPA SDPC \
-			    SDPE SDPG SDPS DAPA DAPC DAPE DAPG DAPS DDOPC DDOPE DDOPS TSPC SSM ASM BSM 23SM LSM OSM NSM CER160 CER180 CER181 CER200 CER220 CER240 \
-			    CER241 CER3E CER6 CER3 DHPCE DMPCE DMPEE DOPCE DOPEE DPPEE POPCE POPEE QMPE PMPE PMPG PPPE PYPE PVPG APPC IPPC PHPC DPPGK BMGP LAU \
-			    MYR PAL STE ARA BEH TRI LIGN MYRO PALO HTA OLE LIN ALIN SDA GLA EICO EDA MEA DGLA ETE ETA EPA ARAN HPA ERU DDA ADR DPT DPA DHA NER \
-			    TTA TPT TPA THA LAUP MYRP  PALP STEP AREP BEHP TRIP LIGNP MYROP PALOP HTAP OLEP LINP ALINP SDAP GLAP EICOP EDAP MEAP DGLAP ETEP \
-			    EPAP ARANP HPAP ERUP DDAP ADRP DPTP DPAP DHAP NERP TTAP TPTP TPAP THAP CHAPS CHAPSO DDMG DOMG DDAO UDAO LDAO BUDTM ADDTM BDDTM \
-			    LAPAO TRIPAO FOS10 FOS12 FOS13 FOS14 FOS15 FOS16 UFOS10 LPC12 LPC14 FOIS9 FOIS11 C6DHPC C7DHPC CYFOS3 CYFOS4 CYFOS5 CYFOS6 CYFOS7 \
-			    SDS LMPG LPPG DDAOP UDAOP LDAOP LAPAOP TRPAOP AOG BOG ANG BNG ADG BDG ADDG BDDG ACY3G BCY3G AMHCG BMHCG AOM BOM ANM BNM ADM BDM \
-			    AUDM BUDM A2UDM B2UDM ADDM BDDM ADMHM BDMHM APPM BPPM ATM BTM ACY3M BCY3M ACY4M BCY4M ACY5M BCY5M ACY6M BCY6M ACY7M BCY7M NHEG \
-			    DHEG NMG DMG SMDD BBPHG BBCYG BOGNG BOTGNG BOING BLMNG BDMNG C5MNG C6MNG AHTG BHTG AOTG BOTG AOTM BOTM ANTM BNTM ADTM BDTM AUDTM "
-	set GUESSED {}
-        if {![[atomselect $ID $RESLIP] num]} {
-            ::RPresolver::ErrorMessCheck "No lipids could be detected automatically! Please choose a valid lipid selection."
-        } else {
-	    set seg [lsort -unique [[atomselect top "$RESLIP"] get segname]]
-	    set GUESSED "segname $seg"
-            ::RPresolver::UpdateStatusText "IDLE"
-	    ::RPresolver::add_rep_all $ID $GUESSED
-	    return $GUESSED
+#MOVE THIS ABOVE
+proc ::RingPiercing::param_settings {args} {
+	# Parameter settings
+	foreach par $paramlist {
+		set f [open $par "r"]
+		set out [open [file join $directory [file tail $par]] w ]
+		set txt [read -nonewline ${f}]
+		puts $out $txt
+		close $f
+		close $out
 	}
 }
 
-proc ::RPresolver::SanityCheck {} {
-       # Set variables in current namespace
-        set psf  $::RPresolver::psffile
-        set pdb  $::RPresolver::pdbfile
-        set conf $::RPresolver::conffile
-        set MembSelection $::RPresolver::lselection
-        set restrGroupSelect $::RPresolver::restrainedselection
-        set custom_conffile $::RPresolver::custom_conffile
-        set namdcommand $::RPresolver::namdcommand
-        set namdcommandOpt $::RPresolver::namdcommandOpt
-        set restrainedbilayer $::RPresolver::restrainedbilayer
-        set forceconstbilayer $::RPresolver::forceconstbilayer
-        set restrained $::RPresolver::restrained
-        set forceconst $::RPresolver::forceconst
-        set exchange $::RPresolver::exchange
-        set nreplicas $::RPresolver::nreplicas
-        set num_min1 $::RPresolver::num_min1
-        set num_md1 $::RPresolver::num_md1
-        set num_min2 $::RPresolver::num_min2
-        set num_md2 $::RPresolver::num_md2
-        set ExProc $::RPresolver::ExProc
-        set outputpath $::RPresolver::outputpath
-	variable ::RPresolver::ChangeFreqOut 0
+proc ::RingPiercing::resolve_piercing {outputpath namdbin namdargs {namdextraconf ""}} {
 
-	# Checking initial settings and files
-        ::RPresolver::UpdateStatusText "Checking..."
-        ::RPresolver::consoleMessage "Check settings and files"
-        foreach f [list $psf $pdb $namdcommand $exchange $nreplicas $MembSelection $num_min1 $num_md1 $num_min2 $num_md2 $outputpath] tag [list "PSF file" "PDB file" "NAMD path" "Lipid exchange" "Number of replica" "Lipid selection" "Min. steps (first eq.)" "MD. steps (first eq.)" "Min. steps (second eq.)" "MD. steps (second eq.)" "Output path"] {
-            if {[string trim $f] eq ""} {
-                ::RPresolver::ErrorMessCheck "Error: \"$tag\" variable is empty!"
-            }
-        }
-        if {$restrainedbilayer} {
-            if {[string trim $forceconstbilayer] eq ""} {
-                ::RPresolver::ErrorMessCheck "Error: \"Force constant (bilayer)\" variable is empty!"
-            }
-            if {$forceconstbilayer <= 0} {::RPresolver::ErrorMessCheck "Error: force constant for phosphate-phospate distance colvar must be higher than 0!"}
-            if {![string is double $forceconstbilayer]} {::RPresolver::ErrorMessCheck "Error: force constant for phosphate-phospate distance colvar is not a floating-point value!"}
-        }
-        if {$restrained} {
-            foreach f [list $forceconst $restrGroupSelect] tag [list "Force constant (group)" "Group selection"] {
-                if {[string trim $f] eq ""} {
-                    ::RPresolver::ErrorMessCheck "Error: \"$tag\" variable is empty!"
-                }
-            }
-            if {$forceconst <= 0} {::RPresolver::ErrorMessCheck "Error: force constant for group restrain must be higher than 0!"}
-            if {![string is double $forceconst]} {::RPresolver::ErrorMessCheck "Error: force constant for group restrain is not a floating-point value!"}
-        }
+#if psf is ring_piercing/system.psf
+set tail [file tail $psf] #system.psf
+set name [file rootname $tail] #system
+set mid [mol new $psf] 
 
-        foreach f [list $psf $pdb] tag [list "PSF file" "PDB file"] {
-            if {[file exists $f] == 0} {
-                    ::RPresolver::ErrorMessCheck "Error: \"$tag\" does not exist!"
-            }
-        }
+mol addfile [file join $outputpath $name.pdb] waitfor all
 
-        foreach f [list $nreplicas $num_min1 $num_md1 $num_min2 $num_md2] tag [list "Number of replica" "Min. steps (first eq.)" "MD. steps (first eq.)" "Min. steps (second eq.)" "MD. steps (second eq.)"] {
-            if {![string is integer [string trim $f]] || $f < 0} {
-                ::RPresolver::ErrorMessCheck "Error: \"$tag\" is not a positive integer!"
-            }
-        }
-        if {$exchange > 100 || $exchange <= 0} {::RPresolver::ErrorMessCheck "Error: lipid exchange percentage must be higher than 0% and lower than 100%!"}
-        if {$nreplicas <= 0 || ![string is integer $nreplicas]} {::RPresolver::ErrorMessCheck "Error: specify a valid number for number of replica to generate (\"Numer of replicas\" variable)"}
-        if {$custom_conffile} {
-            if {[string trim $conf] eq "" || [file exists $conf] == 0} {
-                ::RPresolver::ErrorMessCheck "Error: configuration file variable is empty or the file does not exist!"
-            }
-            # Check if minimization or MD steps are multiple of restart and dcd output frequency 
-            set grep1 [lindex [::RPresolver::GrepEmu "restartfreq" $conf 1] 0]
-            set grep2 [lindex [::RPresolver::GrepEmu "dcdfreq" $conf 1] 0]
-            if {[lindex $grep1 0] == "" || [lindex $grep1 1] == "" } {::RPresolver::ErrorMessCheck "Conf file does not contain \"restartfreq\" keyword, which is needed in the simulation!"}
-            if {[lindex $grep2 0] == "" || [lindex $grep2 1] == "" } {::RPresolver::ErrorMessCheck "Conf file does not contain \"dcdfreq\" keyword, which is needed in the simulation!"}
-            set confrest [string trim [lindex $grep1 1] ";"]
-            set confdcd [string trim [lindex $grep2 1] ";"]
-            foreach v [list $confrest $confdcd] t1 [list "\"restartfreq\" in conf file" "\"dcdfreq\" in conf file"] {
-                foreach e [list $num_min1 $num_md1 $num_min2 $num_md2] t2 [list "minsteps1" "runsteps1" "minsteps2" "runsteps2"] {
-                    if {$v>$e} { 
-                        #::RPresolver::ErrorMessCheck "Frequency for $t1 is higher than \"$t2\" variable set in this script!"
-			set listmp [concat $num_min1 $num_md1 $num_min2 $num_md2]
-			set ::RPresolver::ChangeFreqOut [expr int([tcl::mathfunc::min {*}$listmp]/2)]
-                        puts "Output frequency $t1 is higher than \"$t2\" variable. Setting all output frequency to $::RPresolver::ChangeFreqOut!"
-                    }
-                    if {[expr int([expr {fmod($e,$v)}])]} {
-                        #::RPresolver::ErrorMessCheck "\"$t2\" variable must be a multiple of frequency for $t1!"
-			set listmp [concat $num_min1 $num_md1 $num_min2 $num_md2]
-			set ::RPresolver::ChangeFreqOut [expr int([tcl::mathfunc::min {*}$listmp]/2)]
-                        puts "Variable \"$t2\" is not a multiple of output frequency $t1. Setting all output frequencies to $::RPresolver::ChangeFreqOut!"
-                    }
-                }
-            }
-        }
-        # Check if membrane selection is empty
-        mol new $psf
-        mol addfile $pdb
-        set IDi [molinfo top]
-        if {![[atomselect $IDi "$MembSelection"] num]} {
-            ::RPresolver::ErrorMessCheck "No atoms found for \"$MembSelection\"! \nCannot continue without a valid \nmembrane selection."
-        }
-        # Get total amount of lipids in each leaflet and check if there are at least two resid per leaflet
-        set listmp [::RPresolver::GetLeafLipids $IDi $MembSelection]
-	if {[llength [lindex $listmp 0]] < 2 || [llength [lindex $listmp 1]] < 2} {
-            ::RPresolver::ErrorMessCheck "There are less than 2 residue ID in \"$MembSelection\" \nper leaflet! Not enough to exchange."
+set asel [atomselect $mid "all"]
+
+$asel set beta 0
+
+animate write psf [file join $outputpath ::RingPiercing::psffile] 
+
+animate write pdb [file join $outputpath ::RingPiercing::pdbfile] 
+
+mdffi sim $asel -o [file join $outputpath grid_rp.dx] -res 10 -spacing 1
+
+set finished 0
+
+set counter 0
+
+set othersel [atomselect $mid "within 4 of occupancy > 0 and not withinbonds 3 of occupancy > 0"]
+
+set badbeta [atomselect $mid "beta > 0"]
+
+#puts "$namdbin $namdargs [file join $outputpath minimize.namd] $namdextraconf"
+
+while { ! $finished } {
+
+::ExecTool::exec $namdbin $namdargs [file join $directory $::RingPiercing::conffile] > [file join $directory $name.log]
+
+animate delete all $mid
+
+incr counter
+
+incr finished
+
+#mol addfile [file join $directory out.coor] type namdbin waitfor all
+mol addfile ring_piercing/out.coor type namdbin waitfor all 0
+
+set unfinished [vecsum [$asel get beta]]
+
+$asel set beta 0
+
+$asel set occupancy 0
+
+foreach bond [topo getbondlist -molid $mid] { 
+
+	if { [measure bond $bond molid $mid] > 2.3 } {
+	
+		set ssel [atomselect $mid "same residue as index $bond"]
+		set segname [lindex [$ssel get segname] 0]
+		set comp [string compare $segname PROT]
+	
+		if {$comp != 0} {
+			$ssel set beta 1
+			$ssel set occupancy 1	
+			set finished 0	
+			$ssel delete
+		}
 	}
-	# Check if phosphorous exist in selection
-        if {$restrainedbilayer && ![[atomselect $IDi "$MembSelection and name P"] num]} {
-	    ::RPresolver::ErrorMessWarn "No phosphorous atoms in \"$MembSelection\"!"
-        }
-	# Check if atoms exist in Group selection
-        if {$restrained && ![[atomselect $IDi "$restrGroupSelect"] num]} {
-            ::RPresolver::ErrorMessWarn "No atoms found \"$restrGroupSelect\"!"
-        }
-        # Check is progress file is already present, overwrite previous simulations?
-        set tmpdir [file dirname $outputpath]
-        set tmptail [file tail $outputpath]
-        set wd_master [file join $tmpdir [regsub {[ ]} $tmptail {} ]]
-        variable progressFile [file join $wd_master "MMP.PROGRESS.txt"]
-        if {[file exists $progressFile]} {
-	    ::RPresolver::ErrorMessWarn "The progress file exist already! \nIf you continue previous simulations might be overwritten." 
-        }
 }
 
-proc ::RPresolver::prepareRunScript {} {
-	::RPresolver::UpdateStateRun disabled
-	# Create a tcl script to run this plugin in VMD text mode
-        # Some initial checkings
-        ::RPresolver::SanityCheck 
-	# The script is written in the current directory.
-        ::RPresolver::UpdateStatusText "Writing..."
-	::RPresolver::consoleMessage "Build run script."
-	set ScriptName [file join [pwd] "MMP.RunScript.tcl"]
-	set OUT [open $ScriptName w]
-	puts $OUT "# Generated by Membrane Mixer plugin."
-	puts $OUT "# Run through VMD text mode."
-	puts $OUT "# E.g.: vmd -dispdev text -e \"MMP.RunScript.tcl\""
-	puts $OUT ""
-	puts $OUT "# Require Membrane Mixer package"
-	puts $OUT "package require RPresolver"
-	puts $OUT "# SET VARIABLES"
-	puts $OUT "# Variables were checked when this script was generated through the GUI."
-	puts $OUT "# At this point, the plugin does not check them anymore. Be careful what you change here."
-	puts $OUT "set ::RPresolver::psffile  \"$::RPresolver::psffile\""
-	puts $OUT "set ::RPresolver::pdbfile  \"$::RPresolver::pdbfile\""
-	puts $OUT "set ::RPresolver::conffile \"$::RPresolver::conffile\""
-	puts $OUT "set ::RPresolver::custom_conffile $::RPresolver::custom_conffile"
-	puts $OUT "set ::RPresolver::parfiles {$::RPresolver::parfiles}"
-	puts $OUT "set ::RPresolver::outputpath \"$::RPresolver::outputpath\""
-	puts $OUT "set ::RPresolver::lselection \"$::RPresolver::lselection\""
-	puts $OUT "set ::RPresolver::restrainedbilayer $::RPresolver::restrainedbilayer"
-	puts $OUT "set ::RPresolver::forceconstbilayer $::RPresolver::forceconstbilayer"
-	puts $OUT "set ::RPresolver::restrained $::RPresolver::restrained"
-	puts $OUT "set ::RPresolver::forceconst $::RPresolver::forceconst"
-	puts $OUT "set ::RPresolver::restrainedselection \"$::RPresolver::restrainedselection\""
-	puts $OUT "set ::RPresolver::ExProc $::RPresolver::ExProc"
-	puts $OUT "set ::RPresolver::exchange $::RPresolver::exchange"
-	puts $OUT "set ::RPresolver::nreplicas $::RPresolver::nreplicas"
-	puts $OUT "set ::RPresolver::num_min1 $::RPresolver::num_min1"
-	puts $OUT "set ::RPresolver::num_md1 $::RPresolver::num_md1"
-	puts $OUT "set ::RPresolver::num_min2 $::RPresolver::num_min2"
-	puts $OUT "set ::RPresolver::num_md2 $::RPresolver::num_md2"
-	puts $OUT "set ::RPresolver::namdcommand \"$::RPresolver::namdcommand\""
-	puts $OUT "set ::RPresolver::namdcommandOpt \"$::RPresolver::namdcommandOpt\""
-	puts $OUT "set ::RPresolver::BuildScript 1"
-	puts $OUT "set ::RPresolver::ChangeFreqOut $::RPresolver::ChangeFreqOut"
-	puts $OUT "# Run plugin from command line"
-	puts $OUT "::RPresolver::run_exchange"
-	puts $OUT ""
-	close $OUT
-	::RPresolver::consoleMessage "Written in: [pwd]"
-        ::RPresolver::UpdateStatusText "IDLE"
-        ::RPresolver::UpdateStateRun normal
+$othersel update
+
+#set fout [open [file join $directory "addenda.namd"] w ]
+
+#puts $fout $namdextraconf
+
+if { [$othersel num] } {
+	puts $fout "colvars on\ncolvarsconfig colvars.conf\n"
 }
 
-### MAIN PROCEDURE: run exchage of lipids
-proc ::RPresolver::run_exchange {} {
-	set script $::RPresolver::BuildScript
-	if {!$script} {::RPresolver::UpdateStateRun disabled}
-	# Set variables in current namespace
-	set psf  "$::RPresolver::psffile"
-	set pdb  "$::RPresolver::pdbfile"
-	set conf "$::RPresolver::conffile"
-	set MembSelection $::RPresolver::lselection
-	set restrGroupSelect $::RPresolver::restrainedselection
-	set custom_conffile $::RPresolver::custom_conffile
-	set parfiles $::RPresolver::parfiles
-        set namdcommand $::RPresolver::namdcommand
-        set namdcommandOpt $::RPresolver::namdcommandOpt
-        set restrainedbilayer $::RPresolver::restrainedbilayer
-        set forceconstbilayer $::RPresolver::forceconstbilayer
-        set restrained $::RPresolver::restrained
-        set forceconst $::RPresolver::forceconst
-        set exchange $::RPresolver::exchange
-        set nreplicas $::RPresolver::nreplicas
-        set num_min(1) $::RPresolver::num_min1
-        set num_md(1) $::RPresolver::num_md1
-        set num_min(2) $::RPresolver::num_min2
-        set num_md(2) $::RPresolver::num_md2
-        set ExProc $::RPresolver::ExProc
-        set outputpath $::RPresolver::outputpath
-	# Grid-force settings
-        set resolution 6
-        set spacing 0.8
-        # Initialize list of all molID
-        set lisMolID {}
-	# Set variable to skip a replica in case NAMD crashes
-	set SKIPREP 0
-	# Follow number of membranes generated and skipped
-	set lisGenerated {}
-	set lisSkipped {}
+close $fout
 
-	# Some initial checkings
-	if {!$script} {::RPresolver::SanityCheck}
-	set ChangeFreqOut $::RPresolver::ChangeFreqOut
+if { ! $finished && $counter > 100 } {
+	error "Minimization $namd was not successful, even after 100 iterations."
+}
 
-	# Set master working directory. Remove spaces in path name.
-	set tmpdir [file dirname $outputpath]
-	set tmptail [file tail $outputpath]
-	set wd_master [file join $tmpdir [regsub {[ ]} $tmptail {} ]]
-	file mkdir $wd_master
-	# Set txt file to output progresses of plugin
-	variable progressFile [file join $wd_master "MMP.PROGRESS.txt"]
-	file delete $progressFile
-	#Set a root name from psf file, avoid spaces in the path
-	set ROOTPSF [regsub {[ ]} [file rootname [file tail $psf]] {} ]
+if { ! $finished } {
+	$badbeta update
+	mdffi sim $badbeta -o [file join $directory grid_rp.dx] -res 10 -spacing 1
+}
 
-        puts2 "################################################################################"
-        puts2 "                           MEMBRANE  MIXER  1.0"
-        puts2 "################################################################################"
-	puts2 " For additional information, see:"
-	puts2 " http://www.ks.uiuc.edu/Research/vmd/plugins/RPresolver"
-	puts2 ""
-	puts2 " AUTHORS:"
-	puts2 " Giuseppe Licari"
-	puts2 " http://www.ks.uiuc.edu/~giuseppe"
-	puts2 " giuseppe@ks.uiuc.edu"
-	puts2 ""
-	puts2 " Sepehr Dehghani-Ghahnaviyeh"
-	puts2 " http://www.ks.uiuc.edu/~sepehr"
-	puts2 " sepehrd2@illinois.edu"
-	puts2 ""
-	puts2 " Beckman Institute for Advanced Science and Technology"
-	puts2 " University of Illinois, Urbana-Champaign"
-	puts2 ""
-	puts2 " If you use membranes generated using Membrane Mixer, please cite:"
-	puts2 " G. Licari, S. Dehghani-Ghahnaviyeh, E. Tajkhorshid, in preparation."
-        puts2 "################################################################################"
+if { $unfinished } {
+	set finished 0
+}
 
-	# Make temporary configuration file
-	puts3 -nonewline "Making temporary NAMD configuration file..."
-	set conftmp [file join $wd_master "MMP.CONFTMP.conf"]
-	set filetmp [file join $wd_master "MMP.FILETMP.conf"]
-	if {$custom_conffile} {
-	    # Copy original conf file and remove all unwanted possible lines.
-	    file copy -force $conf $conftmp
-	    ::RPresolver::WriteRemoveLines [list "mgridforce" "minimize" "numsteps" "run" "bincoordinates" "binvelocities" "extendedsystem" "outputname" "temperature" "cellbasisvector" "cellorigin" "margin" "langevinpistonperiod" "langevinpistondecay"] $conftmp $filetmp
-	    if {$ChangeFreqOut} {
-	        ::RPresolver::WriteRemoveLines [list "dcdfreq" "outputenergies" "xstfreq" "restartfreq"] $conftmp $filetmp
-	    }
-	    if {$restrainedbilayer} {
-	        ::RPresolver::WriteRemoveLines "colvars" $conftmp $filetmp
-	    }
-	    if {$restrained} {
-	        ::RPresolver::WriteRemoveLines [list "constraint" "consexp" "consref" "conskfile" "conskcol" "selectConstr"] $conftmp $filetmp
-	    }
-	} else {
-	    ::RPresolver::WriteTMPConf $conftmp
-	}
-	puts2 "Done."
-	puts2 ""
-
-	# Centering membrane
-	display update ui
-	puts2 "Centering membrane in the simulation box..."
-	if {!$script} {::RPresolver::consoleMessage "Center membrane"}
-	mol delete all
-	mol new $psf
-	mol addfile $pdb
-	set IDi [molinfo top]
-	display update ui
-	set pbcvalue [pbc get]
-	if {![lindex $pbcvalue 0 0]} {
-    	puts2 "Warning: no pbc info in pdb file."
-    	set mm [measure minmax [atomselect $IDi "water"]]
-    	set pbcguess [vecsub [lindex $mm 1] [lindex $mm 0]]
-    	if {[veclength $pbcguess]} {
-        	pbc set $pbcguess
-        	puts2 "The pbc will be set to minmax value of selection \"water\"."
-    	} else {
-        	set mm [measure minmax [atomselect $IDi "all"]]
-        	set pbcguess [vecsub [lindex $mm 1] [lindex $mm 0]]
-        	pbc set $pbcguess
-        	puts2 "The pbc will be set to minmax value of selection \"all\"."
-    	}
-	}
-	pbc box
-	set all [atomselect $IDi "all"]
-	# Wrap all atoms around the selection of reference. First center protein if present.
-	if {[[atomselect $IDi "protein"] num]} {
-    	    pbc wrap -sel "all" -center com -centersel "protein" -compound residue
-    	    puts2 "Protein was centered."
-	}
-	pbc wrap -sel "all" -center com -centersel $MembSelection -compound residue
-	puts2 "Membrane (selection \"$MembSelection\") was centered."
-	set com_all [measure center $all weight mass]
-	$all moveby [vecinvert [vecsub $com_all {0 0 0}]]
-	$all delete
-	# Save new pdb file
-	set pdb "[file join $wd_master ${ROOTPSF}.CENTERED.pdb]"
-	[atomselect $IDi all] writepdb $pdb
-	puts2 "Centered membrane saved as: \"$pdb\". It will be used from now on in the script."
-	# Save unit cell info to start simulations
-	set xsc "[file join $wd_master ${ROOTPSF}.CENTERED.xsc]"
-	pbc writexst $xsc -now
-	puts2 "Unit cell info saved as:    \"$xsc\". It will be used from now on in the script."
-	puts2 ""
-
-	# Load initial structure
-	mol delete all
-	mol new $psf
-	mol addfile $pdb
-	set IDo [molinfo top]
-	mol rename $IDo "Centered membrane"
-	# Set some representations
-	::RPresolver::add_rep_all $IDo $MembSelection
-	mol off $IDo
-	display update ui
-
-	# Get total amount of lipids in each leaflet
-	set listmp [::RPresolver::GetLeafLipids $IDo $MembSelection]
-	set Leaf1 [lindex $listmp 0]
-	set Leaf2 [lindex $listmp 1]
-	set membZcenter [lindex $listmp 2]
-	set NumLip1 [llength $Leaf1]
-	set NumLip2 [llength $Leaf2]
-
-	# Establish how many lipids will be exchanged. Must be an even number.
-	# If NL1 and NL2 are zero then set them to 2, in order to exchange at least 2 lipids per leaflet.
-	set NL1 [expr round($exchange*$NumLip1/100.)]
-	if {![expr {($NL1 % 2) == 0}]} {set NL1 [expr $NL1 + 1]};# make it even if odd
-	if {$NL1<2} {set NL1 2};# make it equal 2 if zero
-	puts2 "Number $NumLip1 lipids in UPPER leaflet. Number of lipid to exchange in UPPER leaflet is $NL1."
-	set NL2 [expr round($exchange*$NumLip2/100.)]
-	if {![expr {($NL2 % 2) == 0}]} {set NL2 [expr $NL2 + 1]};# make it even if odd
-	if {$NL2<2} {set NL2 2};# make it equal 2 if zero
-	puts2 "Number $NumLip2 lipids in LOWER leaflet. Number of lipid to exchange in LOWER leaflet is $NL2."
-	display update ui
-
-###########################################################################################
-	# Loop for generating multiple membranes
-	for {set numrep 1} {$numrep<=$nreplicas} {incr numrep} {
-	    # Format number of replica
-	    if {$nreplicas < 10} {
-	        set numrepF  [format %d $numrep]
-	    } elseif {$nreplicas <= 99 && $nreplicas >= 10} {
-	        set numrepF  [format %02d $numrep]
-	    } else {
-	        set numrepF  [format %03d $numrep]
-	    }
-	    puts2 ""
-	    puts2 "********************************************************************************"
-	    puts2 "                            REPLICA  NUMBER $numrepF "
-	    puts2 "********************************************************************************"
-
-	    # Reinitialize variable to skip replica to 0
-	    set SKIPREP 0
-	    # Create directory were to transfer simulation files after simulation
-	    set name_dir MMP.${ROOTPSF}.REP${numrepF}
-	    set wd $wd_master
-	    set wdrep [file join $wd_master $name_dir]
-
-	    # Get resid of lipids to exchange
-	    puts3 -nonewline "Selecting lipids to exchange..."
-	    if {!$script} {::RPresolver::consoleMessage "Select lipid to exchange (R$numrepF)"}
-	    set lisAllTMP1 $Leaf1
-	    set lisAllTMP2 $Leaf2
-	    set lisLeaf1 [::RPresolver::get_res_leaflet $NL1 $lisAllTMP1]
-	    set lisLeaf2 [::RPresolver::get_res_leaflet $NL2 $lisAllTMP2]
-	    puts2 "Done."
-	    puts2 ""
-	    puts2 "The following lipid resid in selection \"$MembSelection\" and UPPER leaflet: [lindex $lisLeaf1 0]"
-	    puts2 "                                           will be exchanged with these: [lindex $lisLeaf1 1]"
-	    puts2 ""
-	    puts2 "The following lipid resid in selection \"$MembSelection\" and LOWER leaflet: [lindex $lisLeaf2 0]"
-	    puts2 "                                           will be exchanged with these: [lindex $lisLeaf2 1]"
-	    display update ui
-
-	    # List of all lipids to exchange ordered by exchanging pairs
-	    set lisEx {}
-	    for {set i 0} {$i<[llength [lindex $lisLeaf1 0]]} {incr i} {
-    	        lappend lisEx [lindex $lisLeaf1 0 $i]
-    	        lappend lisEx [lindex $lisLeaf1 1 $i]
-	    }
-	    for {set i 0} {$i<[llength [lindex $lisLeaf2 0]]} {incr i} {
-    	        lappend lisEx [lindex $lisLeaf2 0 $i]
-    	        lappend lisEx [lindex $lisLeaf2 1 $i]
-	    }
-	    display update ui
-
-	    # Load structure
-	    if {$numrep>1} {
-    	        mol off [lindex $lisMolID end]
-    	        mol off [expr [lindex $lisMolID end] + 1] 
-	    }
-	    mol new $psf
-	    mol addfile $pdb
-	    set ID [molinfo top]
-	    lappend lisMolID $ID
-	    mol rename $ID "Lipid exchange REP$numrepF"
-	    display update ui
-	    # Set some representations
-	    ::RPresolver::add_rep_all $ID $MembSelection
-	    # Add lipid representation
-	    ::RPresolver::add_rep_lipid $ID $MembSelection $lisEx
-	    display update ui
-
-###############################################################################################
-	    #### Equilibrations (EQ1 or EQ2) ####
-	    # BEGINNING of "foreach" loop
-	    foreach PHASE {"EQ1" "EQ2"} tagPhase {"Equilibration 1" "Equilibration 2"} indPhase {1 2} {
-	        if {!$script} {::RPresolver::UpdateStatusText "$tagPhase - Replica $numrepF/$nreplicas"}
-	        puts2 ""
-	        puts2 $tagPhase
-	        # Select molecule ID to work on
-	        set ID [lindex $lisMolID end]
-
-	        # Generate grid potential
-	        if {!$script} {::RPresolver::consoleMessage "Generate force grid (EQ${indPhase}-R$numrepF)"}
-		display update ui
- 		# For the first equilibration, apply grid to final lipid position, not initial position.
- 		# So the lipid are temporarily exchange to generate the postential, and then moved back to original position.
- 		if {$PHASE == "EQ1"} {
- 	    	    puts2 "Use final lipid position as grid position"
-                     set c 0
-                     for {set i 0} {$i<[expr [llength $lisEx]/2]} {incr i} {
-                         set r1 [lindex $lisEx $c]
-                         set r2 [lindex $lisEx [expr $c + 1]]
-                         set resname1 [lindex [[atomselect $ID "$MembSelection and resid $r1"] get resname] 0]
-                         set resname2 [lindex [[atomselect $ID "$MembSelection and resid $r2"] get resname] 0]
-                         ::RPresolver::exchange_com $ID $MembSelection $r1 $r2 $ExProc
-                         set c [expr $c + 2]
-                     }
- 		}
-	        set sel [atomselect $ID "$MembSelection and resid $lisEx"]
-	        set tag [file join $wd "MMP.FORCEGRID.REP${numrepF}.REF${indPhase}"]
-	        puts3 -nonewline "Generating force grid..."
-	        mdff sim $sel -o ${tag}.dx -res $resolution -spacing $spacing
-	        mdff griddx -i ${tag}.dx -o ${tag}.dx
-	        set IDgrid [molinfo top]
-	        $sel delete
-	        mol rename $IDgrid "FORCEGRID${indPhase}"
- 		# Move lipids to original position
- 		if {$PHASE == "EQ1"} {
-                     set c 0
-                     for {set i 0} {$i<[expr [llength $lisEx]/2]} {incr i} {
-                         set r1 [lindex $lisEx $c]
-                         set r2 [lindex $lisEx [expr $c + 1]]
-                         set resname1 [lindex [[atomselect $ID "$MembSelection and resid $r1"] get resname] 0]
-                         set resname2 [lindex [[atomselect $ID "$MembSelection and resid $r2"] get resname] 0]
-                         ::RPresolver::exchange_com $ID $MembSelection $r1 $r2 $ExProc
-                         set c [expr $c + 2]
-                     }
- 		}
-	        puts2 "Done."
-		display update ui
-	        mol modstyle 0 $IDgrid Isosurface 0.500000 0 0 2 1 1
-	        if {$PHASE == "EQ1"} {
-	        	mol modcolor 0 $IDgrid ColorID 3
-	        } elseif {$PHASE == "EQ2"} {
-	        	mol modcolor 0 $IDgrid ColorID 10
-	            mol off [expr [lindex $lisMolID end-1] + 1] ;# turn off molID of first grid-force
-	        }
-	        display update ui
-
-	        # Make grid reference file
-	        puts3 -nonewline "Writing grid reference file..."
-	        [atomselect $ID all] set occupancy 0
-	        [atomselect $ID all] set beta 0
-	        [atomselect $ID "not(protein or ($MembSelection and resid $lisEx))"] set occupancy 1
-	        [atomselect $ID "not(protein or ($MembSelection and resid $lisEx))"] set beta -1
-	        [atomselect $ID all] writepdb ${tag}.pdb
-	        puts2 "Done."
-
-	        # Make new input for simulation
-	        set root [file join $wd MMP.${ROOTPSF}.REP${numrepF}.EQ${indPhase}]
-	        set conf [::RPresolver::MakeConfFile $ID $wd $psf $pdb $xsc $root $num_min($indPhase) $num_md($indPhase) $PHASE $indPhase $numrepF $restrainedbilayer $MembSelection $membZcenter $forceconstbilayer $restrained $restrGroupSelect $forceconst $conftmp $filetmp $ROOTPSF $ChangeFreqOut $parfiles]
-	        display update ui
-
-	        # Start simulation
-	        if {!$script} {::RPresolver::consoleMessage "Start NAMD simulation (EQ${indPhase}-R$numrepF)"}
-	        set SKIPREP [::RPresolver::StartFollowNAMD $root $conf $namdcommand $namdcommandOpt]
-	        if {$SKIPREP} {set SKIPREP 1; break}
-
-	        # Open trajectory 
-	        puts3 -nonewline "Opening trajectory..."
-	        if {!$script} {::RPresolver::consoleMessage "Open trajectory (EQ${indPhase}-R$numrepF)"}
-	        if {[file exists ${root}.dcd] == 0} {::RPresolver::ErrorMessRun "Trajectory file does not exist! This might be due to an early crash of the simulation. SKIPPING THIS REPLICA!"; set SKIPREP 1; break}
-	        mol off $ID
-	        mol new $psf
-	        mol addfile ${root}.dcd waitfor all
-	        set IDlast [molinfo top]
-	        lappend lisMolID $IDlast
-	        mol rename $IDlast $tagPhase
-	        # Set some representations
-	        ::RPresolver::add_rep_all $IDlast $MembSelection
-	        # Add lipid representation
-	        ::RPresolver::add_rep_lipid $IDlast $MembSelection $lisEx
-	        display update ui
-	        puts2 "Done."
-
-	        if {$PHASE == "EQ1"} {
-	    	    # Loop over all lipids to exchange
-	    	    puts2 "Exchanging lipids:"
-	    	    if {!$script} {::RPresolver::consoleMessage "Exchange lipids (EQ${indPhase}-R$numrepF)"}
-	    	    set c 0
-	    	    for {set i 0} {$i<[expr [llength $lisEx]/2]} {incr i} { 
-    	    	        set r1 [lindex $lisEx $c]
-    	    	        set r2 [lindex $lisEx [expr $c + 1]]
-    	    	        set resname1 [lindex [[atomselect $IDlast "$MembSelection and resid $r1"] get resname] 0]
-    	    	        set resname2 [lindex [[atomselect $IDlast "$MembSelection and resid $r2"] get resname] 0]
-    	    	        if {![expr {(($i + 1) % 3) == 0}]} {
-            	        	puts3 -nonewline "[format %4d $r1][format %7s "($resname1)"] <-->[format %4d $r2][format %7s "($resname2)"]   "
-    	    	        } else {
-            	        	puts2 "[format %4d $r1][format %7s "($resname1)"] <-->[format %4d $r2][format %7s "($resname2)"]"
-    	    	        }
-    	    	        ::RPresolver::exchange_com $IDlast $MembSelection $r1 $r2 $ExProc
-    	    	        set c [expr $c + 2]
-	    	    }
-	    	    display update ui
-	    	    puts2 "Done."
-	        }
-	    } ;# END of "foreach" loop
-	    # Continue to next replica if simulations crashed in EQ 1 or EQ2
-	    if {$SKIPREP} {lappend lisSkipped $numrepF; ::RPresolver::MoveSimulationFiles $wdrep $name_dir $numrepF; continue}
-
-###############################################################################################
-	    #### Ring Piercing checking and fixing ####
-	    if {!$script} {::RPresolver::UpdateStatusText "Checking ring piercing - Replica $numrepF/$nreplicas"}
-	    if {!$script} {::RPresolver::consoleMessage "Check ring piercing (R$numrepF)"}
-	    mol off [expr [lindex $lisMolID end-1] + 1] ;# turn off molID of first grid-force
-            puts2 ""
-            # Check if there is ring piercing and, in that case, minimize structure until there is no more ring piercing
-            set cutoff 2.50; # initial cutoff, it will be decreased in the loop
-            set count 1
-            set IDtest [lindex $lisMolID end]
-            mol top $IDtest
-            for {set P 0} {$P<=4} {incr P} {
-                if {$count>=30} {puts2 "Too many ring piercing correction attempts. There might be a serious problem with this replica. SKIPPING THIS REPLICA."; set SKIPREP 1; break}
-                puts2 "Checking ring piercing with cutoff $cutoff Ang"
-                set IDlast $IDtest
-                set piercing [::RPresolver::CheckPiercing $IDlast $psf $cutoff]
-                while {  [llength $piercing] } {
-	            if {!$script} {::RPresolver::UpdateStatusText "Fixing ring piercing - Replica $numrepF/$nreplicas"}
-                    set IDlast $IDtest
-                    set tag [expr $count + 2]
-                    set allpiercing {}
-                    puts2 "WARNING, RING PIERCING!"
-                    puts2 "Trying to correct for piercing: ATTEMPT $count"
-                    puts2 "Move piercing atoms..."
-                    # Move atoms piercing rings and minimize
-                    for {set i 0} {$i<[llength $piercing]} {incr i} {
-                        set indeces [lindex $piercing $i]
-                        ::RPresolver::MovePiercing [lindex $indeces 0] [lindex $indeces 1] $IDlast $count
-                        lappend allpiercing [lindex $indeces 0]
-                        lappend allpiercing [lindex $indeces 1]
-                    }
-                    ::RPresolver::add_rep_piercing $allpiercing $IDlast
-                    display update ui
-                    
-                    # Make new input for minimization
-                    puts2 "Equilibration ${tag} (ring piercing)"
-                    set root [file join $wd MMP.${ROOTPSF}.REP${numrepF}.EQ${tag}]
-                    set conf [::RPresolver::MakeConfFile $IDlast $wd $psf $pdb $xsc $root $num_min(1) $num_md(1) "RP" $tag $numrepF $restrainedbilayer $MembSelection $membZcenter $forceconstbilayer $restrained $restrGroupSelect $forceconst $conftmp $filetmp $ROOTPSF $ChangeFreqOut $parfiles]
-                    
-                    # Start minimization
-                    if {!$script} {::RPresolver::consoleMessage "Fix ring piercing (EQ${tag}-R$numrepF)"}
-                    set SKIPREP [::RPresolver::StartFollowNAMD $root $conf $namdcommand $namdcommandOpt]
-	            if {$SKIPREP} {break}
-                    
-                    # Open trajectory
-                    puts3 -nonewline "Opening trajectory..."
-	    	    if {!$script} {::RPresolver::consoleMessage "Open trajectory (EQ${tag}-R$numrepF)"}
-                    if {[file exists ${root}.dcd] == 0} {::RPresolver::ErrorMessRun "Trajectory file does not exist! This might be due to an early crash of the simulation. SKIPPING THIS REPLICA!"; set SKIPREP 1; break}
-                    mol off $IDlast
-                    mol new $psf
-                    mol addfile ${root}.dcd waitfor all
-                    set IDtest [molinfo top]
-                    mol rename $IDtest "Ring-piercing attempt $count"
-                    display update ui
-                    puts2 "Done."
-                    
-                    # Set some representations
-                    ::RPresolver::add_rep_all $IDtest $MembSelection
-                    # Add lipid representation
-                    ::RPresolver::add_rep_lipid $IDtest $MembSelection $lisEx
-                    display update ui
-                    # Check again ring piercing
-                    set piercing [::RPresolver::CheckPiercing $IDtest $psf $cutoff]
-                    incr count
-                }
-	        if {$SKIPREP} {break}
-                set cutoff [format %.2f [expr $cutoff - 0.15]]
-            }
-	    if {$SKIPREP} {lappend lisSkipped $numrepF; ::RPresolver::MoveSimulationFiles $wdrep $name_dir $numrepF; continue}
-            display update ui
-            if {$count>1} {puts2 "Ring piercings were detected and corrected. However, check always the structure for additional issues."}
-            # Check chirality and cispeptide bonds in protein if present
-            if {[[atomselect $IDlast "protein"] num]} {
-                display update ui
-                puts2 "Checking chirality errors in protein..."
-                set checkchir [chirality check -mol $IDlast -seltext "protein"]
-                if {$checkchir} {
-                    puts2 "Found chirality error! Please check and correct for the errors in the protein if needed."
-	    	    if {!$script} {::RPresolver::consoleMessage "FOUND CHIRALITY ERROR (R$numrepF)"}
-                } else {
-                    puts2 "* No chirality errors *"
-                }
-                display update ui
-                puts2 "Checking cispeptide errors in protein..."
-                set checkcis [cispeptide check -mol $IDlast -seltext "protein"]
-                if {$checkcis} {
-                    puts2 "Found cispeptide error! Please check and correct for the errors in the protein if needed."
-                    puts2 "Remember that some cispeptide bonds are naturally occurring, like in proline."
-	    	if {!$script} {::RPresolver::consoleMessage "FOUND CISPEPTIDE ERROR (R$numrepF)"}
-                } else {
-                    puts2 "* No cispeptide errors *"
-                }
-                display update ui
-            }
-            
-            # Save pdb file containing final membrane replica
-            set outpdb [file join $wd_master ${ROOTPSF}.REPLICA${numrepF}.pdb]
-            set outxsc [file join $wd_master ${ROOTPSF}.REPLICA${numrepF}.xsc]
-            [atomselect $IDlast all] writepdb $outpdb
-            pbc writexst $outxsc -now
-            puts2 ""
-            puts2 " *** Final membrane replica saved as: $outpdb"
-            puts2 " *** Unit cell information  saved as: $outxsc"
-	    if {!$script} {::RPresolver::consoleMessage "Replica generated and saved (R$numrepF)"}
-	    lappend lisGenerated $numrepF
-	    ::RPresolver::MoveSimulationFiles $wdrep $name_dir $numrepF
-            
-        } ;# End of NumReplica loop
-	# Remove unuseful files
-	file delete "MMP.FILETMP.conf"
-	file delete "MMP.CONFTMP.conf"
-	# Summary of run
-        puts2 ""
-        puts2 "*************************************"
-        puts2 ""
-	puts2 "GENERATED MEMBRANES: $lisGenerated (total [llength $lisGenerated])"
-	puts2 "SKIPPED MEMBRANES: $lisSkipped (total [llength $lisSkipped])"
-        puts2 ""
-        puts2 "*************************************"
-        puts2 ""
-	if {!$script} {
-	    ::RPresolver::UpdateStatusText "IDLE"
-	    ::RPresolver::UpdateStateRun normal
-   	}
-###########################################################################################
+$asel writepdb [file join $directory ::RingPiercing::pdbfile]
 
 }
 
-# vmd_install_extension RPresolver RPresolver_tk "Modeling/Membrane Mixer"
+$asel writepdb [file join $directory $name.pdb]
+
+$asel delete
+
+$othersel delete
+
+$badbeta delete
+
+mol delete $mid
+
+}
+
+#minimizestructures ring_piercing namd2 "+p16" "parameters par_all36m_prot.prm \n"
+minimizestructures ::RingPiercing::outputpath ::RingPiercing::namdbin ::RingPiercing::namdargs "parameters par_all36m_prot.prm \n"
