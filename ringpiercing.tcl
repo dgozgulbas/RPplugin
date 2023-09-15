@@ -245,13 +245,32 @@ variable psffile
     #        set tempfile [tk_getOpenFile -title "Select NAMD executable"]
     #        if {![string equal $tempfile ""]} { set ::RingPiercing::namdbin $tempfile }
     #    }] -row 1 -column 2 -sticky w
-    foreach l {"label" "command" } {::TKTOOLTIP::balloon $f.run.namd${l} "Specify the path to NAMD executable."}
+
+#MOVE THIS LATER OUT OF THE CURRENT FUNCTION
+proc ::RingPiercing::getProcs {} {
+    global tcl_platform env
+    if {$::tcl_platform(os) == "Darwin"} {
+        catch {exec sysctl -n hw.ncpu} proce
+        return $proce
+    } elseif {$::tcl_platform(os) == "Linux"} {
+        catch {exec grep -c "model name" /proc/cpuinfo} proce
+        return $proce
+    } elseif {[string first "Windows" $::tcl_platform(os)] != -1} {
+        catch {HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\CentralProcessor } proce
+        set proce [llength $proce]
+        return $proce
+    }
+}
+
+
+
+    foreach l {"label" "bin" } {::TKTOOLTIP::balloon $f.run.namd${l} "Specify the path to NAMD executable."}
     #variable namdargs "-gpu +p[::RingPiercing::getProcs]"
     variable namdargs "+idlepoll +setcpuaffinity +p[::RingPiercing::getProcs]"
     grid [label  $f.run.namdlabelOpt -text "NAMD options:"] -row 2 -column 0 -sticky w
     grid [entry  $f.run.namdargs -width 30 -textvariable namdargs] -row 2 -column 1 -columnspan 2 -sticky ew
     # grid [entry  $f.run.namdargs -width 30 -textvariable ::RingPiercing::namdargs] -row 2 -column 1 -columnspan 2 -sticky ew
-    foreach l {"labelOpt" "namdargs"} {::TKTOOLTIP::balloon $f.run.namd${l} "Specify options used to run NAMD."}
+    foreach l {"labelOpt" "args"} {::TKTOOLTIP::balloon $f.run.namd${l} "Specify options used to run NAMD."}
     grid columnconfigure $f.run 1 -weight 1 -minsize 55
 
     grid [button $f.button1 -text "RUN!" -width 20 -state normal \
@@ -287,6 +306,7 @@ variable psffile
     return $w
 #}
 #UNCOMMENT HERE
+
 
 
 proc ::RingPiercing::psffileCheck {args} {
