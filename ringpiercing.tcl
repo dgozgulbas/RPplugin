@@ -349,29 +349,40 @@ proc ::RingPiercing::param_settings {args} {
 
 proc ::RingPiercing::resolve_piercing {outputpath namdbin namdargs {namdextraconf ""}} {
 
+#The code starts by checking if the PSF file is named "ring_piercing/system.psf" and performs several actions based on this condition.
+#It extracts the filename part from the PSF file path and stores it in the "tail" variable. 
+#For example, if the PSF file path is "ring_piercing/system.psf," the "tail" variable would contain "system.psf."
+#It further extracts the root name of the file (without the extension) and stores it in the "name" variable. 
+#In this example, "name" would contain "system."
 #if psf is ring_piercing/system.psf
 set tail [file tail $psf] #system.psf
 set name [file rootname $tail] #system
-set mid [mol new $psf] 
 
+# Creates a new molecular object ("mol") named "mid" using the PSF file.
+# It adds a PDB file to the molecular object "mid" by joining the output path and the "name.pdb" file name. 
+# This PDB file contains coordinates and serves as an initial structure.
+set mid [mol new $psf] 
 mol addfile [file join $outputpath $name.pdb] waitfor all
 
+# An atom selection ("asel") is created for all atoms in the "mid" object.
+# The beta value for all atoms in the "asel" selection is set to 0.
 set asel [atomselect $mid "all"]
-
 $asel set beta 0
 
+# The code writes a PSF/PDB file to the specified output path using the "animate" command. 
+# This PSF/PDB file is given the name specified in the ::RingPiercing::psffile variable.
 animate write psf [file join $outputpath ::RingPiercing::psffile] 
-
 animate write pdb [file join $outputpath ::RingPiercing::pdbfile] 
 
+# A molecular dynamics flexible fitting (MDFF) simulation is initiated on the "asel" selection. 
+# The resulting potential energy grid is saved in a file named "grid_rp.dx" within the output path.
 mdffi sim $asel -o [file join $outputpath grid_rp.dx] -res 10 -spacing 1
 
+# The "finished" variable is initialized to 0, and a "counter" variable is set to 0 for tracking 
+# the number of iterations.
 set finished 0
-
 set counter 0
-
 set othersel [atomselect $mid "within 4 of occupancy > 0 and not withinbonds 3 of occupancy > 0"]
-
 set badbeta [atomselect $mid "beta > 0"]
 
 #puts "$namdbin $namdargs [file join $outputpath minimize.namd] $namdextraconf"
@@ -383,7 +394,6 @@ while { ! $finished } {
 animate delete all $mid
 
 incr counter
-
 incr finished
 
 #mol addfile [file join $directory out.coor] type namdbin waitfor all
@@ -392,7 +402,6 @@ mol addfile ring_piercing/out.coor type namdbin waitfor all 0
 set unfinished [vecsum [$asel get beta]]
 
 $asel set beta 0
-
 $asel set occupancy 0
 
 foreach bond [topo getbondlist -molid $mid] { 
