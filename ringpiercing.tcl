@@ -45,6 +45,7 @@ namespace eval ::RingPiercing:: {
     variable addtopfile 0
     variable conffile "configuration.inp"; # this configuration file must already run properly in the current directory
     #variable conffile {}; # this configuration file must already run properly in the current directory
+    variable name_dir "ring_piercing"
     variable outputpath [pwd]; #output directory, default is current directory
     # Specify atomselect containing lipid residues that one wants to exchange
     variable lselection "segname MEMB"
@@ -355,14 +356,16 @@ proc ::RingPiercing::resolve_piercing {outputpath namdbin namdargs {namdextracon
 #It further extracts the root name of the file (without the extension) and stores it in the "name" variable. 
 #In this example, "name" would contain "system."
 #if psf is ring_piercing/system.psf
+
 set tail [file tail $psf] #system.psf
 set name [file rootname $tail] #system
+set outpath [file join $outputpath $name_dir]
 
 # Creates a new molecular object ("mol") named "mid" using the PSF file.
 # It adds a PDB file to the molecular object "mid" by joining the output path and the "name.pdb" file name. 
 # This PDB file contains coordinates and serves as an initial structure.
 set mid [mol new $psf] 
-mol addfile [file join $outputpath $name.pdb] waitfor all
+mol addfile [file join $outpath $name.pdb] waitfor all
 
 # An atom selection ("asel") is created for all atoms in the "mid" object.
 # The beta value for all atoms in the "asel" selection is set to 0.
@@ -371,12 +374,12 @@ $asel set beta 0
 
 # The code writes a PSF/PDB file to the specified output path using the "animate" command. 
 # This PSF/PDB file is given the name specified in the ::RingPiercing::psffile variable.
-animate write psf [file join $outputpath ::RingPiercing::psffile] 
-animate write pdb [file join $outputpath ::RingPiercing::pdbfile] 
+animate write psf [file join $outpath ::RingPiercing::psffile] 
+animate write pdb [file join $outpath ::RingPiercing::pdbfile] 
 
 # A molecular dynamics flexible fitting (MDFF) simulation is initiated on the "asel" selection. 
 # The resulting potential energy grid is saved in a file named "grid_rp.dx" within the output path.
-mdffi sim $asel -o [file join $outputpath grid_rp.dx] -res 10 -spacing 1
+mdffi sim $asel -o [file join $outpath grid_rp.dx] -res 10 -spacing 1
 
 # The "finished" variable is initialized to 0, and a "counter" variable is set to 0 for tracking 
 # the number of iterations.
@@ -389,7 +392,7 @@ set badbeta [atomselect $mid "beta > 0"]
 
 while { ! $finished } {
 
-::ExecTool::exec $namdbin $namdargs [file join $directory $::RingPiercing::conffile] > [file join $directory $name.log]
+::ExecTool::exec $namdbin $namdargs [file join $outpath $::RingPiercing::conffile] > [file join $outpath $name.log]
 
 animate delete all $mid
 
@@ -397,7 +400,7 @@ incr counter
 incr finished
 
 #mol addfile [file join $directory out.coor] type namdbin waitfor all
-mol addfile ring_piercing/out.coor type namdbin waitfor all 0
+mol addfile $outpath/out.coor type namdbin waitfor all 0
 
 set unfinished [vecsum [$asel get beta]]
 
@@ -439,18 +442,18 @@ if { ! $finished && $counter > 100 } {
 
 if { ! $finished } {
 	$badbeta update
-	mdffi sim $badbeta -o [file join $directory grid_rp.dx] -res 10 -spacing 1
+	mdffi sim $badbeta -o [file join $outpath grid_rp.dx] -res 10 -spacing 1
 }
 
 if { $unfinished } {
 	set finished 0
 }
 
-$asel writepdb [file join $directory ::RingPiercing::pdbfile]
+$asel writepdb [file join $outpath ::RingPiercing::pdbfile]
 
 }
 
-$asel writepdb [file join $directory $name.pdb]
+$asel writepdb [file join $outpath ::RingPiercing::pdbfile]
 
 $asel delete
 
