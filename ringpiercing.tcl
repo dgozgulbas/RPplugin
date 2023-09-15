@@ -111,6 +111,27 @@ variable psffile
     trace add variable ::RingPiercing::num_md2 write ::RingPiercing::md2Check
     trace add variable ::RingPiercing::namdbin write ::RingPiercing::namdbinCheck
     
+    set namdargs $::RingPiercing::namdargs
+    set psf  $::RingPiercing::psffile
+    set pdb  $::RingPiercing::pdbfile
+    set conf $::RingPiercing::conffile
+    set MembSelection $::RingPiercing::lselection
+    set restrGroupSelect $::RingPiercing::restrainedselection
+    set custom_conffile $::RingPiercing::custom_conffile
+    set namdcommand $::RingPiercing::namdcommand
+    set namdcommandOpt $::RingPiercing::namdcommandOpt
+    set restrainedbilayer $::RingPiercing::restrainedbilayer
+    set forceconstbilayer $::RingPiercing::forceconstbilayer
+    set restrained $::RingPiercing::restrained
+    set forceconst $::RingPiercing::forceconst
+    set exchange $::RingPiercing::exchange
+    set nreplicas $::RingPiercing::nreplicas
+    set num_min1 $::RingPiercing::num_min1
+    set num_md1 $::RingPiercing::num_md1
+    set num_min2 $::RingPiercing::num_min2
+    set num_md2 $::RingPiercing::num_md2
+    set ExProc $::RingPiercing::ExProc
+    set outputpath $::RingPiercing::outputpath
     set f $w
     
     # Add a menu bar
