@@ -86,7 +86,7 @@ proc ringpiercing_tk {} {
     return $RingPiercing::w
 }
 #UNCOMMENT HERE
-proc ::RingPiercing::ringpiercing {} {
+# proc ::RingPiercing::ringpiercing {} {
 variable psffile
 
     # ::RingPiercing::init_default_topology
@@ -313,7 +313,7 @@ proc ::RingPiercing::getProcs {} {
     
     
     return $w
-}
+#}
 #UNCOMMENT HERE
 
 
