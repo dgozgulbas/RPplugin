@@ -19,6 +19,8 @@
 # Citation: 
 # in preparation.  
 #==============================================================================
+# source /Projects/defne/RPplugin/ringpiercing.tcl
+# vmd_install_extension ringpiercingpackage ringpiercingpackage_tk "Modeling/Ring Piercing Resolver"
 
 package provide ringpiercingpackage 1.0
 
