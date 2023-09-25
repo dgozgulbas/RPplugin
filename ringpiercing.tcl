@@ -266,7 +266,7 @@ variable psffile
     grid columnconfigure $f.run 1 -weight 1 -minsize 55
 
     grid [button $f.button1 -text "RUN!" -width 20 -state normal \
-    -command {set ::RingPiercing::BuildScript 0; ::RingPiercing::resolve_piercing}]  -row 6 -column 0 -padx 4 -pady 4 -sticky we
+    -command {set ::RingPiercing::BuildScript 0; ::RingPiercing::resolve_piercing $::RingPiercing::outputpath namdbin namdargs "parameters par_all36m_prot.prm \n"}]  -row 6 -column 0 -padx 4 -pady 4 -sticky we
     ::TKTOOLTIP::balloon $f.button1 "Start resolving piercings in current VMD session."
     grid [button $f.button2 -text "Build script" -width 20 -state normal \
     -command {set ::RingPiercing::BuildScript 1; ::RingPiercing::prepareRunScript}]  -row 7 -column 0 -padx 4 -pady 4 -sticky we
@@ -524,7 +524,7 @@ proc ::RingPiercing::resolve_piercing {outputpath namdbin namdargs {namdextracon
 }
 
 #minimizestructures ring_piercing namd2 "+p16" "parameters par_all36m_prot.prm \n"
-::RingPiercing::resolve_piercing $::RingPiercing::outputpath namdbin namdargs "parameters par_all36m_prot.prm \n"
+#::RingPiercing::resolve_piercing $::RingPiercing::outputpath namdbin namdargs "parameters par_all36m_prot.prm \n"
 # minimizestructures ::RingPiercing::outputpath ::RingPiercing::namdbin ::RingPiercing::namdargs "parameters par_all36m_prot.prm \n"
 
 # Procedure to start and follow a NAMD simulation run
