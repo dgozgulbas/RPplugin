@@ -160,30 +160,4 @@ guesscoord
 writepsf ring_piercing/system_fl_rp.psf
 writepdb ring_piercing/system_fl_rp.pdb
 
-# psfgen_logfile close
-# if {0} {
-# package require solvate
-# solvate full_ini.psf full_ini.pdb -o tmp/solvate -b 1.5 -minmax {{-32.4 -32.4 -60} {32.4 32.4 60}}
-
-
-# resetpsf
-# set sel [atomselect top "all and not (water and same residue as (z<15 and z>-15))"]
-# $sel writepdb tmp/solvate2.pdb
-# $sel writepsf tmp/solvate2.psf
-# mol delete all
-
-# autoionize -psf tmp/solvate2.psf -pdb tmp/solvate2.pdb -sc .15 -o final_full
-
-# mol load psf final_full.psf pdb final_full.pdb
-# set atom1 [[atomselect top "protein and resid 61 and name OT1"] get index]
-# set atom2 [[atomselect top "protein and resid 46 and name HT2"] get index]
-# set atom3 [[atomselect top "protein and resid 61 and name HN"] get index]
-# set atom4 [[atomselect top "protein and resid 46 and name O"] get index]
-
-# set fp [open "extra.bond" w]
-# puts $fp "bond $atom1 $atom2 30 3.2"
-# puts $fp "bond $atom3 $atom4 30 3.2"
-# close $fp
-
-# }
 
