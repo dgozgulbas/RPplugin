@@ -86,7 +86,7 @@ proc ringpiercing_tk {} {
     return $RingPiercing::w
 }
 #UNCOMMENT HERE
-# proc ::RingPiercing::ringpiercing {} {
+proc ::RingPiercing::ringpiercing {} {
 variable psffile
 
     # ::RingPiercing::init_default_topology
@@ -313,7 +313,7 @@ proc ::RingPiercing::getProcs {} {
     
     
     return $w
-#}
+}
 #UNCOMMENT HERE
 
 
@@ -410,19 +410,23 @@ proc ::RingPiercing::resolve_piercing {outputpath namdbin namdargs {namdextracon
 
     set psf $::RingPiercing::psffile
     set pdb $::RingPiercing::pdbfile
-
+    puts "here1"
     set tail [file tail $psf]
     set name [file rootname $tail]
+
+    file mkdir $outputpath/$::RingPiercing::name_dir
     set outpath [file join $outputpath $::RingPiercing::name_dir]
-    cp $psf $outpath
-    cp $pdb $outpath
-    puts $outputpath
+    puts $outpath
+    
+    file copy -force $psf $outpath
+    file copy -force $pdb $outpath
+
     # Creates a new molecular object ("mol") named "mid" using the PSF file.
     # It adds a PDB file to the molecular object "mid" by joining the output path and the "name.pdb" file name. 
     # This PDB file contains coordinates and serves as an initial structure.
     set mid [mol new $psf] 
     mol addfile [file join $outpath $name.pdb] waitfor all
-    puts "here1"
+
     # An atom selection ("asel") is created for all atoms in the "mid" object.
     # The beta value for all atoms in the "asel" selection is set to 0.
     set asel [atomselect $mid "all"]
