@@ -13,6 +13,8 @@
 ## Citation: 
 ##   
 ##==============================================================================
+# source /Projects/defne/RPplugin/ringpiercing.tcl
+# vmd_install_extension ringpiercingpackage ringpiercingpackage_tk "Modeling/Ring Piecing Resolver"
 
 package provide membranemixerpackage 1.0
 

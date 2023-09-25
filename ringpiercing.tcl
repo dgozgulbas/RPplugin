@@ -20,7 +20,7 @@
 # in preparation.  
 #==============================================================================
 
-package provide RPresolver 1.0
+package provide ringpiercingpackage 1.0
 
 # package requirements
 if { [info exists tk_version] } {
@@ -78,25 +78,25 @@ namespace eval ::RingPiercing:: {
 
 
 proc rpr {} {
-    return [eval ::RingPiercing::ringpiercing]
+    return [eval ::RingPiercing::ringpiercingpackage]
 }
 
-proc ringpiercing_tk {} {
-    ::RingPiercing::ringpiercing
+proc ringpiercingpackage_tk {} {
+    ::RingPiercing::ringpiercingpackage
     return $RingPiercing::w
 }
 #UNCOMMENT HERE
-proc ::RingPiercing::ringpiercing {} {
+proc ::RingPiercing::ringpiercingpackage {} {
 variable psffile
 
     # ::RingPiercing::init_default_topology
     variable w
-    if { [winfo exists .ringpiercing] } {
-        wm deiconify .ringpiercing
+    if { [winfo exists .ringpiercingpackage] } {
+        wm deiconify .ringpiercingpackage
         return
     }
     
-    set w [toplevel ".ringpiercing"]
+    set w [toplevel ".ringpiercingpackage"]
     wm title $w "Ring Piercing Resolver"
     wm resizable $w 1 1
     
@@ -158,7 +158,7 @@ variable psffile
     -command {tk_messageBox -type ok -title "About Ring Piercing Resolver" \
     -message "This plugin finds and resolves ring piercings caused by systemic clashes using alchemical methods and grid-force potentials.\n \nAuthors:\nDefne Gorgun Ozgulbas\nJosh Vermaas"}
     $f.menubar.help.menu add command -label "Help..." \
-    -command "vmd_open_url [string trimright [vmdinfo www] /]/plugins/ringpiercing"
+    -command "vmd_open_url [string trimright [vmdinfo www] /]/plugins/ringpiercingpackage"
     grid $f.menubar.help -column 0 -row 0 -sticky e -padx 0 -pady 0
     grid columnconfigure $f.menubar 0 -weight 1
     
@@ -255,23 +255,6 @@ variable psffile
     #        if {![string equal $tempfile ""]} { set ::RingPiercing::namdbin $tempfile }
     #    }] -row 1 -column 2 -sticky w
 
-#MOVE THIS LATER OUT OF THE CURRENT FUNCTION
-proc ::RingPiercing::getProcs {} {
-    global tcl_platform env
-    if {$::tcl_platform(os) == "Darwin"} {
-        catch {exec sysctl -n hw.ncpu} proce
-        return $proce
-    } elseif {$::tcl_platform(os) == "Linux"} {
-        catch {exec grep -c "model name" /proc/cpuinfo} proce
-        return $proce
-    } elseif {[string first "Windows" $::tcl_platform(os)] != -1} {
-        catch {HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\CentralProcessor } proce
-        set proce [llength $proce]
-        return $proce
-    }
-}
-
-
 
     foreach l {"label" "bin" } {::TKTOOLTIP::balloon $f.run.namd${l} "Specify the path to NAMD executable."}
     #variable namdargs "-gpu +p[::RingPiercing::getProcs]"
@@ -283,11 +266,11 @@ proc ::RingPiercing::getProcs {} {
     grid columnconfigure $f.run 1 -weight 1 -minsize 55
 
     grid [button $f.button1 -text "RUN!" -width 20 -state normal \
-    -command {set ::RingPiercing::BuildScript 0; ::RingPiercing::run_exchange}]  -row 6 -column 0 -padx 4 -pady 4 -sticky we
-    ::TKTOOLTIP::balloon $f.button1 "Start membrane generation in current VMD session."
+    -command {set ::RingPiercing::BuildScript 0; ::RingPiercing::resolve_piercing}]  -row 6 -column 0 -padx 4 -pady 4 -sticky we
+    ::TKTOOLTIP::balloon $f.button1 "Start resolving piercings in current VMD session."
     grid [button $f.button2 -text "Build script" -width 20 -state normal \
     -command {set ::RingPiercing::BuildScript 1; ::RingPiercing::prepareRunScript}]  -row 7 -column 0 -padx 4 -pady 4 -sticky we
-    ::TKTOOLTIP::balloon $f.button2 "Prepare script to run Membrane Mixer later.\nThis is particularly useful if one wants to\nrun in another computer or in a cluster."
+    ::TKTOOLTIP::balloon $f.button2 "Prepare script to run Ring Piercing Resolver later.\nThis is particularly useful if one wants to\nrun in another computer or in a cluster."
     
     
     # Statusbar
@@ -317,6 +300,21 @@ proc ::RingPiercing::getProcs {} {
 #UNCOMMENT HERE
 
 
+#MOVE THIS LATER OUT OF THE CURRENT FUNCTION
+proc ::RingPiercing::getProcs {} {
+    global tcl_platform env
+    if {$::tcl_platform(os) == "Darwin"} {
+        catch {exec sysctl -n hw.ncpu} proce
+        return $proce
+    } elseif {$::tcl_platform(os) == "Linux"} {
+        catch {exec grep -c "model name" /proc/cpuinfo} proce
+        return $proce
+    } elseif {[string first "Windows" $::tcl_platform(os)] != -1} {
+        catch {HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\CentralProcessor } proce
+        set proce [llength $proce]
+        return $proce
+    }
+}
 
 proc ::RingPiercing::psffileCheck {args} {
     variable w
