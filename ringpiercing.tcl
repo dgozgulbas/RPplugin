@@ -76,8 +76,17 @@ namespace eval ::RingPiercing:: {
     variable setGridForceOn 1; # Internal use only. Should always be set to 1
 }
 
+
+proc rpr {} {
+    return [eval ::RingPiercing::ringpiercing]
+}
+
+proc ringpiercing_tk {} {
+    ::RingPiercing::ringpiercing
+    return $RingPiercing::w
+}
 #UNCOMMENT HERE
-# proc ::RingPiercing::ringpiercing {} {
+proc ::RingPiercing::ringpiercing {} {
 variable psffile
 
     # ::RingPiercing::init_default_topology
@@ -304,7 +313,7 @@ proc ::RingPiercing::getProcs {} {
     
     
     return $w
-#}
+}
 #UNCOMMENT HERE
 
 
@@ -399,116 +408,121 @@ proc ::RingPiercing::resolve_piercing {outputpath namdbin namdargs {namdextracon
 #In this example, "name" would contain "system."
 #if psf is ring_piercing/system.psf
 
-set tail [file tail $psf] #system.psf
-set name [file rootname $tail] #system
-set outpath [file join $outputpath $name_dir]
+    set psf $::RingPiercing::psffile
+    set pdb $::RingPiercing::pdbfile
 
-# Creates a new molecular object ("mol") named "mid" using the PSF file.
-# It adds a PDB file to the molecular object "mid" by joining the output path and the "name.pdb" file name. 
-# This PDB file contains coordinates and serves as an initial structure.
-set mid [mol new $psf] 
-mol addfile [file join $outpath $name.pdb] waitfor all
+    set tail [file tail $psf]
+    set name [file rootname $tail]
+    set outpath [file join $outputpath $::RingPiercing::name_dir]
+    cp $psf $outpath
+    cp $pdb $outpath
+    puts $outputpath
+    # Creates a new molecular object ("mol") named "mid" using the PSF file.
+    # It adds a PDB file to the molecular object "mid" by joining the output path and the "name.pdb" file name. 
+    # This PDB file contains coordinates and serves as an initial structure.
+    set mid [mol new $psf] 
+    mol addfile [file join $outpath $name.pdb] waitfor all
+    puts "here1"
+    # An atom selection ("asel") is created for all atoms in the "mid" object.
+    # The beta value for all atoms in the "asel" selection is set to 0.
+    set asel [atomselect $mid "all"]
+    $asel set beta 0
 
-# An atom selection ("asel") is created for all atoms in the "mid" object.
-# The beta value for all atoms in the "asel" selection is set to 0.
-set asel [atomselect $mid "all"]
-$asel set beta 0
+    # The code writes a PSF/PDB file to the specified output path using the "animate" command. 
+    # This PSF/PDB file is given the name specified in the ::RingPiercing::psffile variable.
+    animate write psf [file join $outpath ::RingPiercing::psffile] 
+    animate write pdb [file join $outpath ::RingPiercing::pdbfile] 
 
-# The code writes a PSF/PDB file to the specified output path using the "animate" command. 
-# This PSF/PDB file is given the name specified in the ::RingPiercing::psffile variable.
-animate write psf [file join $outpath ::RingPiercing::psffile] 
-animate write pdb [file join $outpath ::RingPiercing::pdbfile] 
+    # A molecular dynamics flexible fitting (MDFF) simulation is initiated on the "asel" selection. 
+    # The resulting potential energy grid is saved in a file named "grid_rp.dx" within the output path.
+    mdffi sim $asel -o [file join $outpath grid_rp.dx] -res 10 -spacing 1
 
-# A molecular dynamics flexible fitting (MDFF) simulation is initiated on the "asel" selection. 
-# The resulting potential energy grid is saved in a file named "grid_rp.dx" within the output path.
-mdffi sim $asel -o [file join $outpath grid_rp.dx] -res 10 -spacing 1
+    # The "finished" variable is initialized to 0, and a "counter" variable is set to 0 for tracking 
+    # the number of iterations.
+    set finished 0
+    set counter 0
+    set othersel [atomselect $mid "within 4 of occupancy > 0 and not withinbonds 3 of occupancy > 0"]
+    set badbeta [atomselect $mid "beta > 0"]
 
-# The "finished" variable is initialized to 0, and a "counter" variable is set to 0 for tracking 
-# the number of iterations.
-set finished 0
-set counter 0
-set othersel [atomselect $mid "within 4 of occupancy > 0 and not withinbonds 3 of occupancy > 0"]
-set badbeta [atomselect $mid "beta > 0"]
+    #puts "$namdbin $namdargs [file join $outputpath minimize.namd] $namdextraconf"
 
-#puts "$namdbin $namdargs [file join $outputpath minimize.namd] $namdextraconf"
+    while { ! $finished } {
 
-while { ! $finished } {
+    ::ExecTool::exec $namdbin $namdargs [file join $outpath $::RingPiercing::conffile] > [file join $outpath $name.log]
 
-::ExecTool::exec $namdbin $namdargs [file join $outpath $::RingPiercing::conffile] > [file join $outpath $name.log]
+    animate delete all $mid
 
-animate delete all $mid
+    incr counter
+    incr finished
 
-incr counter
-incr finished
+    #mol addfile [file join $directory out.coor] type namdbin waitfor all
+    mol addfile $outpath/out.coor type namdbin waitfor all 0
 
-#mol addfile [file join $directory out.coor] type namdbin waitfor all
-mol addfile $outpath/out.coor type namdbin waitfor all 0
+    set unfinished [vecsum [$asel get beta]]
 
-set unfinished [vecsum [$asel get beta]]
+    $asel set beta 0
+    $asel set occupancy 0
 
-$asel set beta 0
-$asel set occupancy 0
+    foreach bond [topo getbondlist -molid $mid] { 
 
-foreach bond [topo getbondlist -molid $mid] { 
+        if { [measure bond $bond molid $mid] > 2.3 } {
+        
+            set ssel [atomselect $mid "same residue as index $bond"]
+            set segname [lindex [$ssel get segname] 0]
+            set comp [string compare $segname PROT]
+        
+            if {$comp != 0} {
+                $ssel set beta 1
+                $ssel set occupancy 1	
+                set finished 0	
+                $ssel delete
+            }
+        }
+    }
 
-	if { [measure bond $bond molid $mid] > 2.3 } {
-	
-		set ssel [atomselect $mid "same residue as index $bond"]
-		set segname [lindex [$ssel get segname] 0]
-		set comp [string compare $segname PROT]
-	
-		if {$comp != 0} {
-			$ssel set beta 1
-			$ssel set occupancy 1	
-			set finished 0	
-			$ssel delete
-		}
-	}
-}
+    $othersel update
 
-$othersel update
+    #set fout [open [file join $directory "addenda.namd"] w ]
 
-#set fout [open [file join $directory "addenda.namd"] w ]
+    #puts $fout $namdextraconf
 
-#puts $fout $namdextraconf
+    if { [$othersel num] } {
+        puts $fout "colvars on\ncolvarsconfig colvars.conf\n"
+    }
 
-if { [$othersel num] } {
-	puts $fout "colvars on\ncolvarsconfig colvars.conf\n"
-}
+    close $fout
 
-close $fout
+    if { ! $finished && $counter > 100 } {
+        error "Minimization $namd was not successful, even after 100 iterations."
+    }
 
-if { ! $finished && $counter > 100 } {
-	error "Minimization $namd was not successful, even after 100 iterations."
-}
+    if { ! $finished } {
+        $badbeta update
+        mdffi sim $badbeta -o [file join $outpath grid_rp.dx] -res 10 -spacing 1
+    }
 
-if { ! $finished } {
-	$badbeta update
-	mdffi sim $badbeta -o [file join $outpath grid_rp.dx] -res 10 -spacing 1
-}
+    if { $unfinished } {
+        set finished 0
+    }
 
-if { $unfinished } {
-	set finished 0
-}
+    $asel writepdb [file join $outpath ::RingPiercing::pdbfile]
 
-$asel writepdb [file join $outpath ::RingPiercing::pdbfile]
+    }
 
-}
+    $asel writepdb [file join $outpath ::RingPiercing::pdbfile]
 
-$asel writepdb [file join $outpath ::RingPiercing::pdbfile]
+    $asel delete
 
-$asel delete
+    $othersel delete
 
-$othersel delete
+    $badbeta delete
 
-$badbeta delete
-
-mol delete $mid
+    mol delete $mid
 
 }
 
 #minimizestructures ring_piercing namd2 "+p16" "parameters par_all36m_prot.prm \n"
-minimizestructures outpath namdbin namdargs "parameters par_all36m_prot.prm \n"
+::RingPiercing::resolve_piercing $::RingPiercing::outputpath namdbin namdargs "parameters par_all36m_prot.prm \n"
 # minimizestructures ::RingPiercing::outputpath ::RingPiercing::namdbin ::RingPiercing::namdargs "parameters par_all36m_prot.prm \n"
 
 # Procedure to start and follow a NAMD simulation run
