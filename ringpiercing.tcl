@@ -462,7 +462,7 @@ proc ::RingPiercing::resolve_piercing {outputpath namdcommand namdargs {namdextr
     while { ! $finished } {
         set conffiledir [file join $outpath $::RingPiercing::conffile]
         set logfiledir [file join $outpath $name.log]
-        eval ::ExecTool::exec \"${namdcommand}\" ${namdargs} \"${conffiledir}\" > \"${logfiledir}.log\" &
+        eval ::ExecTool::exec \"${namdcommand}\" ${namdargs} \"${conffiledir}\" > \"${logfiledir}.log\" 
 
         animate delete all $mid
 
@@ -500,11 +500,11 @@ proc ::RingPiercing::resolve_piercing {outputpath namdcommand namdargs {namdextr
 
         #puts $fout $namdextraconf
 
-        if { [$othersel num] } {
-            puts $fout "colvars on\ncolvarsconfig colvars.conf\n"
-        }
+        # if { [$othersel num] } {
+        #     puts $fout "colvars on\ncolvarsconfig colvars.conf\n"
+        # }
 
-        close $fout
+        # close $fout
 
         if { ! $finished && $counter > 100 } {
             error "Minimization $namd was not successful, even after 100 iterations."
