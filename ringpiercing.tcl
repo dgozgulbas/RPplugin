@@ -443,8 +443,8 @@ proc ::RingPiercing::resolve_piercing {outputpath namdcommand namdargs {namdextr
 
     # The code writes a PSF/PDB file to the specified output path using the "animate" command. 
     # This PSF/PDB file is given the name specified in the ::RingPiercing::psffile variable.
-    animate write psf [file join $outpath ::RingPiercing::psffile] 
-    animate write pdb [file join $outpath ::RingPiercing::pdbfile] 
+    animate write psf [file join $outpath $psf] 
+    animate write pdb [file join $outpath $pdb] 
 
     # A molecular dynamics flexible fitting (MDFF) simulation is initiated on the "asel" selection. 
     # The resulting potential energy grid is saved in a file named "grid_rp.dx" within the output path.
@@ -519,11 +519,11 @@ proc ::RingPiercing::resolve_piercing {outputpath namdcommand namdargs {namdextr
             set finished 0
         }
 
-        $asel writepdb [file join $outpath ::RingPiercing::pdbfile]
+        $asel writepdb [file join $outpath $pdb]
 
     }
 
-    $asel writepdb [file join $outpath ::RingPiercing::pdbfile]
+    $asel writepdb [file join $outpath $pdb]
 
     $asel delete
 
