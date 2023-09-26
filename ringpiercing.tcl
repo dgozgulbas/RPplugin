@@ -269,7 +269,7 @@ variable psffile
 
 
     grid [button $f.button1 -text "RUN!" -width 20 -state normal \
-    -command {set ::RingPiercing::BuildScript 0; ::RingPiercing::resolve_piercing $::RingPiercing::outputpath $namdbin $namdargs "parameters par_all36m_prot.prm \n"}] -row 6 -column 0 -padx 4 -pady 4 -sticky we
+    -command {set ::RingPiercing::BuildScript 0; ::RingPiercing::resolve_piercing $::RingPiercing::outputpath $::RingPiercing::namdbin $::RingPiercing::namdargs "parameters par_all36m_prot.prm \n"}] -row 6 -column 0 -padx 4 -pady 4 -sticky we
     ::TKTOOLTIP::balloon $f.button1 "Start resolving piercings in current VMD session."
     grid [button $f.button2 -text "Build script" -width 20 -state normal \
     -command {set ::RingPiercing::BuildScript 1; ::RingPiercing::prepareRunScript}]  -row 7 -column 0 -padx 4 -pady 4 -sticky we
@@ -452,65 +452,66 @@ proc ::RingPiercing::resolve_piercing {outputpath namdbin namdargs {namdextracon
     #puts "$namdbin $namdargs [file join $outputpath minimize.namd] $namdextraconf"
 
     while { ! $finished } {
+        set conffiledir [file join $outpath $::RingPiercing::conffile]
+        set logfiledir [file join $outpath $name.log]
+        eval ::ExecTool::exec \"${namdbin}\" ${namdargs} \"${conffiledir}\" > \"${logfiledir}.log\" &
 
-    ::ExecTool::exec $namdbin $namdargs [file join $outpath $::RingPiercing::conffile] > [file join $outpath $name.log]
+        animate delete all $mid
 
-    animate delete all $mid
+        incr counter
+        incr finished
 
-    incr counter
-    incr finished
+        #mol addfile [file join $directory out.coor] type namdbin waitfor all
+        mol addfile $outpath/out.coor type namdbin waitfor all 0
 
-    #mol addfile [file join $directory out.coor] type namdbin waitfor all
-    mol addfile $outpath/out.coor type namdbin waitfor all 0
+        set unfinished [vecsum [$asel get beta]]
 
-    set unfinished [vecsum [$asel get beta]]
+        $asel set beta 0
+        $asel set occupancy 0
 
-    $asel set beta 0
-    $asel set occupancy 0
+        foreach bond [topo getbondlist -molid $mid] { 
 
-    foreach bond [topo getbondlist -molid $mid] { 
-
-        if { [measure bond $bond molid $mid] > 2.3 } {
-        
-            set ssel [atomselect $mid "same residue as index $bond"]
-            set segname [lindex [$ssel get segname] 0]
-            set comp [string compare $segname PROT]
-        
-            if {$comp != 0} {
-                $ssel set beta 1
-                $ssel set occupancy 1	
-                set finished 0	
-                $ssel delete
+            if { [measure bond $bond molid $mid] > 2.3 } {
+            
+                set ssel [atomselect $mid "same residue as index $bond"]
+                set segname [lindex [$ssel get segname] 0]
+                set comp [string compare $segname PROT]
+            
+                if {$comp != 0} {
+                    $ssel set beta 1
+                    $ssel set occupancy 1	
+                    set finished 0	
+                    $ssel delete
+                }
             }
         }
-    }
 
-    $othersel update
+        $othersel update
 
-    #set fout [open [file join $directory "addenda.namd"] w ]
+        #set fout [open [file join $directory "addenda.namd"] w ]
 
-    #puts $fout $namdextraconf
+        #puts $fout $namdextraconf
 
-    if { [$othersel num] } {
-        puts $fout "colvars on\ncolvarsconfig colvars.conf\n"
-    }
+        if { [$othersel num] } {
+            puts $fout "colvars on\ncolvarsconfig colvars.conf\n"
+        }
 
-    close $fout
+        close $fout
 
-    if { ! $finished && $counter > 100 } {
-        error "Minimization $namd was not successful, even after 100 iterations."
-    }
+        if { ! $finished && $counter > 100 } {
+            error "Minimization $namd was not successful, even after 100 iterations."
+        }
 
-    if { ! $finished } {
-        $badbeta update
-        mdffi sim $badbeta -o [file join $outpath grid_rp.dx] -res 10 -spacing 1
-    }
+        if { ! $finished } {
+            $badbeta update
+            mdffi sim $badbeta -o [file join $outpath grid_rp.dx] -res 10 -spacing 1
+        }
 
-    if { $unfinished } {
-        set finished 0
-    }
+        if { $unfinished } {
+            set finished 0
+        }
 
-    $asel writepdb [file join $outpath ::RingPiercing::pdbfile]
+        $asel writepdb [file join $outpath ::RingPiercing::pdbfile]
 
     }
 
