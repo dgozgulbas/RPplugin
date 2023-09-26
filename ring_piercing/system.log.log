@@ -5,7 +5,7 @@ Converse/Charm++ Commit ID: v6.10.2-0-g7bf00fa-namd-charm-6.10.2-build-2020-Aug-
 CharmLB> Load balancer assumes all CPUs are same.
 sched_setaffinity() is not supported, +setcpuaffinity disabled.
 Charm++> Running on 1 hosts (1 sockets x 8 cores x 2 PUs = 16-way SMP)
-Charm++> cpu topology info is gathered in 0.000 seconds.
+Charm++> cpu topology info is gathered in 0.001 seconds.
 Info: NAMD 2.14 for MacOSX-x86_64-multicore
 Info: 
 Info: Please visit http://www.ks.uiuc.edu/Research/namd/
@@ -19,9 +19,9 @@ Info: Built Wed Aug 5 13:07:16 CDT 2020 by jim on malaga.ks.uiuc.edu
 Info: 1 NAMD  2.14  MacOSX-x86_64-multicore  16    dgorgun  defnegorgun
 Info: Running on 16 processors, 1 nodes, 1 physical nodes.
 Info: CPU topology information available.
-Info: Charm++/Converse parallel runtime startup completed at 0.0200306 s
+Info: Charm++/Converse parallel runtime startup completed at 0.0186855 s
 CkLoopLib is used in SMP with simple dynamic scheduling (converse-level notification)
-Info: 4586.69 MB of memory in use based on ps
+Info: 4714.69 MB of memory in use based on ps
 Info: Configuration file is /Users/defnegorgun/Desktop/RPplugin/ring_piercing/minimize.namd
 Info: Changed directory to /Users/defnegorgun/Desktop/RPplugin/ring_piercing
 TCL: couldn't read file "ring.str": no such file or directory

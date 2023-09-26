@@ -66,7 +66,7 @@ namespace eval ::RingPiercing:: {
     variable exchange 50; 	# Exchanging almost all lipids may result in bad membranes
     # Number of replicas to generate
     variable nreplicas 1
-    variable namdbin "namd2"
+    variable namdcommand "namd2"
     variable namdargs 
     # Other variables
     variable consoleMaxHistory 100
@@ -120,7 +120,7 @@ variable psffile
     trace add variable ::RingPiercing::num_min2 write ::RingPiercing::min2Check
     trace add variable ::RingPiercing::num_md1 write ::RingPiercing::md1Check
     trace add variable ::RingPiercing::num_md2 write ::RingPiercing::md2Check
-    trace add variable ::RingPiercing::namdbin write ::RingPiercing::namdbinCheck
+    trace add variable ::RingPiercing::namdcommand write ::RingPiercing::namdcommandCheck
     
     # set namdargs $::RingPiercing::namdargs
     # set psf  $::RingPiercing::psffile
@@ -248,13 +248,13 @@ variable psffile
     
     grid [label $f.run.label -text "Run:"] -row 0 -column 0 -columnspan 1 -sticky w
     
-    #variable namdbin "/Projects/namd2/bin/2.13/Linux64-multicore/namd2"
+    #variable namdcommand "/Projects/namd2/bin/2.13/Linux64-multicore/namd2"
     grid [label  $f.run.namdlabel -text "NAMD path:"] -row 1 -column 0 -sticky w
-    grid [entry  $f.run.namdbin -width 30 -textvariable ::RingPiercing::namdbin] -row 1 -column 1 -sticky ew
+    grid [entry  $f.run.namdcommand -width 30 -textvariable ::RingPiercing::namdcommand] -row 1 -column 1 -sticky ew
     #grid [button $f.run.namdbutton -text "Browse" \
     #    -command {
     #        set tempfile [tk_getOpenFile -title "Select NAMD executable"]
-    #        if {![string equal $tempfile ""]} { set ::RingPiercing::namdbin $tempfile }
+    #        if {![string equal $tempfile ""]} { set ::RingPiercing::namdcommand $tempfile }
     #    }] -row 1 -column 2 -sticky w
 
 
@@ -269,7 +269,7 @@ variable psffile
 
 
     grid [button $f.button1 -text "RUN!" -width 20 -state normal \
-    -command {set ::RingPiercing::BuildScript 0; ::RingPiercing::resolve_piercing $::RingPiercing::outputpath $::RingPiercing::namdbin $::RingPiercing::namdargs "parameters par_all36m_prot.prm \n"}] -row 6 -column 0 -padx 4 -pady 4 -sticky we
+    -command {set ::RingPiercing::BuildScript 0; ::RingPiercing::resolve_piercing $::RingPiercing::outputpath $::RingPiercing::namdcommand $::RingPiercing::namdargs "parameters par_all36m_prot.prm \n"}] -row 6 -column 0 -padx 4 -pady 4 -sticky we
     ::TKTOOLTIP::balloon $f.button1 "Start resolving piercings in current VMD session."
     grid [button $f.button2 -text "Build script" -width 20 -state normal \
     -command {set ::RingPiercing::BuildScript 1; ::RingPiercing::prepareRunScript}]  -row 7 -column 0 -padx 4 -pady 4 -sticky we
@@ -399,7 +399,7 @@ proc ::RingPiercing::param_settings {args} {
 	}
 }
 
-proc ::RingPiercing::resolve_piercing {outputpath namdbin namdargs {namdextraconf ""}} {
+proc ::RingPiercing::resolve_piercing {outputpath namdcommand namdargs {namdextraconf ""}} {
 
 #The code starts by checking if the PSF file is named "ring_piercing/system.psf" and performs several actions based on this condition.
 #It extracts the filename part from the PSF file path and stores it in the "tail" variable. 
@@ -449,12 +449,12 @@ proc ::RingPiercing::resolve_piercing {outputpath namdbin namdargs {namdextracon
     set othersel [atomselect $mid "within 4 of occupancy > 0 and not withinbonds 3 of occupancy > 0"]
     set badbeta [atomselect $mid "beta > 0"]
 
-    #puts "$namdbin $namdargs [file join $outputpath minimize.namd] $namdextraconf"
+    #puts "$namdcommand $namdargs [file join $outputpath minimize.namd] $namdextraconf"
 
     while { ! $finished } {
         set conffiledir [file join $outpath $::RingPiercing::conffile]
         set logfiledir [file join $outpath $name.log]
-        eval ::ExecTool::exec \"${namdbin}\" ${namdargs} \"${conffiledir}\" > \"${logfiledir}.log\" &
+        eval ::ExecTool::exec \"${namdcommand}\" ${namdargs} \"${conffiledir}\" > \"${logfiledir}.log\" &
 
         animate delete all $mid
 
@@ -528,8 +528,8 @@ proc ::RingPiercing::resolve_piercing {outputpath namdbin namdargs {namdextracon
 }
 
 #minimizestructures ring_piercing namd2 "+p16" "parameters par_all36m_prot.prm \n"
-#::RingPiercing::resolve_piercing $::RingPiercing::outputpath namdbin namdargs "parameters par_all36m_prot.prm \n"
-# minimizestructures ::RingPiercing::outputpath ::RingPiercing::namdbin ::RingPiercing::namdargs "parameters par_all36m_prot.prm \n"
+#::RingPiercing::resolve_piercing $::RingPiercing::outputpath namdcommand namdargs "parameters par_all36m_prot.prm \n"
+# minimizestructures ::RingPiercing::outputpath ::RingPiercing::namdcommand ::RingPiercing::namdargs "parameters par_all36m_prot.prm \n"
 
 # Procedure to start and follow a NAMD simulation run
 proc ::MembraneMixer::StartFollowNAMD {root conf NAMDPATH OPTS} {
