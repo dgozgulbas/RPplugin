@@ -45,7 +45,7 @@ namespace eval ::RingPiercing:: {
     variable pdbfile "system.pdb"
     variable custom_conffile 0
     variable addtopfile 0
-    variable conffile "configuration.inp"; # this configuration file must already run properly in the current directory
+    variable conffile "minimize.namd"; # this configuration file must already run properly in the current directory
     #variable conffile {}; # this configuration file must already run properly in the current directory
     variable name_dir "ring_piercing"
     variable outputpath [pwd]; #output directory, default is current directory
@@ -262,18 +262,18 @@ variable psffile
     #variable namdargs "-gpu +p[::RingPiercing::getProcs]"
     variable namdargs "+idlepoll +setcpuaffinity +p[::RingPiercing::getProcs]"
     grid [label  $f.run.namdlabelOpt -text "NAMD options:"] -row 2 -column 0 -sticky w
-    grid [entry  $f.run.namdargs -width 30 -textvariable namdargs] -row 2 -column 1 -columnspan 2 -sticky ew
-    # grid [entry  $f.run.namdargs -width 30 -textvariable ::RingPiercing::namdargs] -row 2 -column 1 -columnspan 2 -sticky ew
+    #grid [entry  $f.run.namdargs -width 30 -textvariable namdargs] -row 2 -column 1 -columnspan 2 -sticky ew
+    grid [entry  $f.run.namdargs -width 30 -textvariable ::RingPiercing::namdargs] -row 2 -column 1 -columnspan 2 -sticky ew
     foreach l {"labelOpt" "args"} {::TKTOOLTIP::balloon $f.run.namd${l} "Specify options used to run NAMD."}
     grid columnconfigure $f.run 1 -weight 1 -minsize 55
 
+
     grid [button $f.button1 -text "RUN!" -width 20 -state normal \
-    -command {set ::RingPiercing::BuildScript 0; ::RingPiercing::resolve_piercing $::RingPiercing::outputpath namdbin namdargs "parameters par_all36m_prot.prm \n"}]  -row 6 -column 0 -padx 4 -pady 4 -sticky we
+    -command {set ::RingPiercing::BuildScript 0; ::RingPiercing::resolve_piercing $::RingPiercing::outputpath $namdbin $namdargs "parameters par_all36m_prot.prm \n"}] -row 6 -column 0 -padx 4 -pady 4 -sticky we
     ::TKTOOLTIP::balloon $f.button1 "Start resolving piercings in current VMD session."
     grid [button $f.button2 -text "Build script" -width 20 -state normal \
     -command {set ::RingPiercing::BuildScript 1; ::RingPiercing::prepareRunScript}]  -row 7 -column 0 -padx 4 -pady 4 -sticky we
     ::TKTOOLTIP::balloon $f.button2 "Prepare script to run Ring Piercing Resolver later.\nThis is particularly useful if one wants to\nrun in another computer or in a cluster."
-    
     
     # Statusbar
     frame $f.statusbar -bd 2 -relief ridge
@@ -420,6 +420,7 @@ proc ::RingPiercing::resolve_piercing {outputpath namdbin namdargs {namdextracon
     
     file copy -force $psf $outpath
     file copy -force $pdb $outpath
+    file copy -force $::RingPiercing::conffile $outpath
 
     # Creates a new molecular object ("mol") named "mid" using the PSF file.
     # It adds a PDB file to the molecular object "mid" by joining the output path and the "name.pdb" file name. 
