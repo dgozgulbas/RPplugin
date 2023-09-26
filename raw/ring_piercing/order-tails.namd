@@ -1,0 +1,129 @@
+#############################################################
+## JOB DESCRIPTION                                         ##
+#############################################################
+
+#Minimize lignin structure under FEP conditions so that ring penetrations can be dealt with.
+
+#############################################################
+## ADJUSTABLE PARAMETERS                                   ##
+#############################################################
+set inputname      system_fl_rp
+structure          $inputname.psf
+coordinates        $inputname.pdb
+
+set runnumber 10
+
+set outputname     order
+set temperature    310
+firsttimestep 0
+source ring.str
+
+#############################################################
+## SIMULATION PARAMETERS                                   ##
+#############################################################
+
+# Input
+paraTypeCharmm      on
+parameters par_all36_carb.prm
+parameters par_all36_cgenff.prm
+parameters par_all36_lipid.prm
+parameters toppar_all36_lipid_cholesterol.str
+parameters par_all36m_prot.prm
+
+# NOTE: Do not set the initial velocity temperature if you 
+# have also specified a .vel restart file!
+# temperature         $temperature
+ 
+
+# Periodic Boundary conditions
+# NOTE: Do not set the periodic cell basis if you have also 
+# specified an .xsc restart file!
+
+#if { $b == "hexa" } {
+#   set b [expr {$a / 2 * sqrt(3)}]
+#   set d [expr {$a / 2}]
+#   set wrapnearst on
+#} else {
+#   set wrapnearst off
+#   set d 0.0
+#}
+
+#cellBasisVector1     $a   0.0   0.0;   # vector to the next image
+#cellBasisVector2     $d    $b   0.0;
+#cellBasisVector3    0.0   0.0    $c;
+#cellOrigin          0.0   0.0 $zcen;   # the *center* of the cell
+
+
+wrapWater           on
+wrapAll             on
+
+
+# Force-Field Parameters
+exclude             scaled1-4
+1-4scaling          1.0
+cutoff              12.
+switching           on
+switchdist          10.
+pairlistdist        13.5
+margin               3
+
+
+# Integrator Parameters
+rigidBonds all
+timestep            2.0
+nonbondedFreq       1
+fullElectFrequency  2  
+stepspercycle       20
+
+useFlexibleCell        yes;            # yes for anisotropic system like membrane
+useConstantRatio        yes;            # keep the x-y cross sectional area constant while varying the z dimension
+
+# Constant Temperature Control
+langevin            on    ;# do langevin dynamics
+langevinDamping     1     ;# damping coefficient (gamma) of 5/ps
+langevinTemp        $temperature
+langevinHydrogen    no    ;# don't couple langevin bath to hydrogens
+temperature $temperature
+
+
+# Output
+outputName          $outputname
+restartname         $outputname.restart
+dcdfile             $outputname.dcd
+xstFile             $outputname.xst
+
+restartfreq         1000
+dcdfreq             20
+xstFreq             1000
+outputEnergies      100
+
+if {1} {
+  constraints     on
+  consexp         2
+  consref         ../constraints_fl-pre.pdb
+  conskfile       ../constraints_fl-pre.pdb
+  conskcol        B
+  constraintScaling 2.0
+  selectConstraints on
+  selectConstrZ    on
+ # margin 5.0
+}
+
+gridforce           on
+gridforcefile       ../lip-tails-pre.pdb
+gridforcecol        B
+gridforcechargecol  O
+gridforcepotfile    ../grid-lip.dx
+gridforcescale      1 1 1
+gridforcecont1      yes
+gridforcecont2      yes
+
+dielectric 80
+
+#source addenda.namd
+
+#############################################################
+## EXECUTION SCRIPT                                        ##
+#############################################################
+
+minimize 10000

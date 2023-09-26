@@ -2,12 +2,12 @@
 ## JOB DESCRIPTION                                         ##
 #############################################################
 
-#Minimize lignin structure under FEP conditions so that ring penetrations can be dealt with.
+#Minimize structure under FEP conditions so that ring penetrations can be dealt with.
 
 #############################################################
 ## ADJUSTABLE PARAMETERS                                   ##
 #############################################################
-set inputname system_fl_rp
+set inputname system
 structure          $inputname.psf
 coordinates        $inputname.pdb
 
@@ -104,7 +104,7 @@ alchLambda2 0.02
 #alchFile ring.ti
 
 gridForce on
-gridForceFile system_fl_rp.pdb
+gridForceFile system.pdb
 gridForceCol B
 gridForceChargeCol O
 gridForcePotFile grid_rp.dx

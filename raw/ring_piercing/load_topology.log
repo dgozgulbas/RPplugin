@@ -1,0 +1,55 @@
+psfgen) reading topology file /Scr/defne/toppar/top_all36_prot.rtf
+
+psfgen) >>>>>>>>CHARMM36 All-Hydrogen Topology File for Proteins <<<<<<
+psfgen) >>>>> Includes phi, psi cross term map (CMAP) correction <<<<<<<
+psfgen) >>>>>>>>>>>>>>>>>>>>>>>>>> May 2011 <<<<<<<<<<<<<<<<<<<<<<<<<<<<
+psfgen)  All comments to the CHARMM web site: www.charmm.org
+psfgen)              parameter set discussion forum
+psfgen) 
+psfgen) Created by CHARMM version 36 1
+psfgen) cross-term entries present in topology definitions
+psfgen) reading topology file /Scr/defne/toppar/top_all36_lipid.rtf
+
+psfgen)   \\\\\\\ CHARMM36 All-Hydrogen Lipid Topology File ///////
+psfgen)   All comments and questions should be submitted to the 
+psfgen)   parameter forum at the CHARMM website: www.charmm.org
+psfgen) 
+psfgen) Created by CHARMM version 36 1
+psfgen) reading topology file /Scr/defne/toppar/toppar_water_ions_namd.str
+
+psfgen)  Toplogy and parameter information for water and ions.
+psfgen) 
+psfgen) reading topology from stream file
+psfgen)  Topology for water and ions
+psfgen) 
+psfgen) Created by CHARMM version 31 1
+psfgen) skipping parameters in stream file
+psfgen)  Parameters for water and ions
+psfgen) 
+psfgen) skipping parameters in stream file
+psfgen)  NBFix between carboxylate and sodium
+psfgen) 
+psfgen) reading topology file /Scr/defne/toppar/top_all36_cgenff.rtf
+
+psfgen)   --------------------------------------------------------------------------  *
+psfgen)           CGenFF: Topology for the Charmm General Force Field v. 4.1          *
+psfgen)                     for Small Molecule Drug Design                            *
+psfgen)   --------------------------------------------------------------------------  *
+psfgen) 
+psfgen) Created by CHARMM version 36 1
+psfgen) reading topology file /Scr/alirasouli/toppar/toppar_all36_lipid_cholesterol_namd.str
+
+psfgen)  Toppar stream file for cholesterol.  Stream following reading of
+psfgen)  top_all36_lipid.rtf
+psfgen)  par_all36_lipid.rtf
+psfgen)  top_all36_cgenff.rtf
+psfgen)  and par_all36_cgenff.prm
+psfgen) 
+psfgen) reading topology from stream file
+psfgen)  Topology for cholesterol   
+psfgen) 
+psfgen) Created by CHARMM version 31 1
+psfgen) skipping parameters in stream file
+psfgen)  cholesterol parameters
+psfgen) 
+psfgen) skipping statements at end of file due to end or return statement

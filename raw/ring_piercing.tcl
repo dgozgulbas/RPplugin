@@ -43,7 +43,7 @@ set fp [open "step5_.str" w+]
 puts $fp "test"
 close $fp
 
-set psf ring_piercing/system_fl_rp.psf
+set psf ring_piercing/system.psf
 
 set tail [file tail $psf]
 
@@ -57,9 +57,9 @@ set asel [atomselect $mid "all"]
 
 $asel set beta 0
 
-animate write psf [file join $directory system_fl_rp.psf] 
+animate write psf [file join $directory system.psf] 
 
-animate write pdb [file join $directory system_fl_rp.pdb] 
+animate write pdb [file join $directory system.pdb] 
 
 mdffi sim $asel -o [file join $directory grid_rp.dx] -res 10 -spacing 1
 
@@ -159,7 +159,7 @@ set finished 0
 
 }
 
-$asel writepdb [file join $directory system_fl_rp.pdb]
+$asel writepdb [file join $directory system.pdb]
 
 }
 
@@ -177,4 +177,4 @@ mol delete $mid
 
 }
 
-minimizestructures ring_piercing namd2 "+p16" "parameters par_all36m_prot.prm \n"
+minimizestructures ring_piercing /Users/defnegorgun/Downloads/NAMD_2.14_MacOSX-x86_64-multicore/namd2 "+p16" "parameters par_all36m_prot.prm \n"

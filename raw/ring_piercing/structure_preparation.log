@@ -1,0 +1,341 @@
+psfgen) building segment P
+psfgen) reading residues from pdb file ring_piercing/protein.pdb
+psfgen) extracted 26 residues from pdb file
+psfgen) Info: generating structure...
+psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping cross-term C-N-CA-C-N-CA-C-N at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping cross-term C-N-CA-C-N-CA-C-N at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+psfgen) segment complete.
+psfgen) reading coordinates from pdb file ring_piercing/protein.pdb for segment P
+psfgen) building segment MEMB
+psfgen) reading residues from pdb file ring_piercing/memb2.pdb
+psfgen) extracted 300 residues from pdb file
+psfgen) Info: generating structure...
+psfgen) segment complete.
+psfgen) reading coordinates from pdb file ring_piercing/memb2.pdb for segment MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:1	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:1	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:1	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:4	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:4	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:4	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:6	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:6	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:6	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:7	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:7	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:7	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:11	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:11	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:11	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:13	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:13	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:13	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:14	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:14	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:14	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:18	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:18	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:18	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:19	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:19	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:19	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:20	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:20	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:20	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:24	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:24	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:24	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:31	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:31	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:31	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:33	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:33	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:33	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:41	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:41	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:41	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:43	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:43	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:43	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:48	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:48	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:48	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:49	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:49	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:49	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:52	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:52	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:52	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:54	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:54	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:54	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:55	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:55	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:55	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:57	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:57	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:57	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:58	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:58	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:58	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:61	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:61	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:61	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:63	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:63	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:63	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:64	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:64	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:64	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:66	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:66	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:66	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:69	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:69	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:69	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:73	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:73	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:73	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:78	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:78	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:78	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:79	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:79	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:79	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:80	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:80	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:80	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:84	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:84	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:84	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:98	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:98	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:98	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:99	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:99	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:99	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:100	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:100	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:100	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:101	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:101	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:101	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:103	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:103	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:103	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:108	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:108	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:108	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:111	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:111	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:111	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:115	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:115	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:115	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:116	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:116	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:116	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:123	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:123	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:123	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:124	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:124	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:124	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:125	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:125	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:125	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:129	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:129	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:129	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:132	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:132	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:132	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:134	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:134	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:134	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:135	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:135	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:135	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:138	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:138	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:138	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:142	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:142	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:142	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:143	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:143	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:143	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:151	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:151	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:151	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:152	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:152	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:152	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:159	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:159	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:159	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:160	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:160	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:160	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:161	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:161	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:161	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:163	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:163	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:163	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:164	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:164	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:164	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:173	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:173	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:173	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:181	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:181	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:181	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:184	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:184	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:184	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:187	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:187	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:187	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:188	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:188	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:188	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:191	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:191	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:191	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:193	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:193	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:193	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:197	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:197	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:197	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:198	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:198	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:198	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:199	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:199	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:199	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:206	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:206	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:206	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:207	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:207	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:207	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:218	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:218	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:218	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:219	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:219	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:219	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:220	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:220	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:220	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:221	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:221	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:221	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:223	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:223	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:223	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:225	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:225	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:225	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:226	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:226	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:226	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:229	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:229	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:229	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:232	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:232	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:232	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:238	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:238	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:238	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:241	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:241	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:241	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:246	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:246	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:246	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:247	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:247	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:247	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:250	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:250	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:250	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:252	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:252	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:252	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:253	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:253	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:253	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:254	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:254	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:254	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:255	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:255	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:255	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:260	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:260	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:260	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:265	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:265	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:265	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:270	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:270	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:270	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:271	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:271	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:271	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:273	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:273	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:273	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:277	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:277	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:277	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:281	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:281	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:281	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:283	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:283	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:283	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:288	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:288	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:288	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:290	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:290	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:290	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:292	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:292	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:292	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:296	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:296	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:296	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:297	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:297	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:297	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6R	 CHL1:300	  MEMB
+psfgen) Warning: failed to set coordinate for atom H6S	 CHL1:300	  MEMB
+psfgen) Warning: failed to set coordinate for atom C28	 CHL1:300	  MEMB
+psfgen) Info: guessing coordinates for 12582 atoms (3564 non-hydrogen)
+psfgen) Info: writing psf file ring_piercing/system_fl_rp.psf
+psfgen) total of 34328 atoms
+psfgen) total of 34439 bonds
+psfgen) total of 67123 angles
+psfgen) total of 97505 dihedrals
+psfgen) total of 459 impropers
+psfgen) total of 0 explicit exclusions
+psfgen) total of 24 cross-terms
+psfgen) Info: psf file complete.
+psfgen) Info: writing pdb file ring_piercing/system_fl_rp.pdb
+psfgen) Info: Atoms with guessed coordinates will have occupancy of 0.0.
+psfgen) Info: pdb file complete.
