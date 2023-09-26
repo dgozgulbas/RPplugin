@@ -24,11 +24,11 @@ source ring.str
 
 # Input
 paraTypeCharmm      on
-parameters par_all36_carb.prm
-parameters par_all36_cgenff.prm
-parameters par_all36_lipid.prm
-parameters toppar_all36_lipid_cholesterol.str
-parameters par_all36m_prot.prm
+parameters toppar/par_all36_carb.prm
+parameters toppar/par_all36_cgenff.prm
+parameters toppar/par_all36_lipid.prm
+parameters toppar/toppar_all36_lipid_cholesterol.str
+parameters toppar/par_all36m_prot.prm
 
 # NOTE: Do not set the initial velocity temperature if you 
 # have also specified a .vel restart file!
@@ -112,7 +112,7 @@ gridForceScale 2 2 2
 
 dielectric 80
 
-source addenda.namd
+# source addenda.namd
 
 #############################################################
 ## EXECUTION SCRIPT                                        ##
