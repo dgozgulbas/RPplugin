@@ -45,9 +45,9 @@ To use this plugin, follow these installation steps:
 
    ```shell
    git clone https://github.com/dgozgulbas/RPplugin.git
-
-   add these lines to your .vmdrc
-    ```sh   
+    ```
+2. Add these lines to your .vmdrc
+    ```shell   
     source [local-directory]/RPplugin/ringpiercing.tcl
     vmd_install_extension ringpiercingpackage ringpiercingpackage_tk "Modeling/Ring Piercing Resolver"
     ```
