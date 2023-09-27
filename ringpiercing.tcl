@@ -36,7 +36,7 @@ package require mdff
 
 #======================================================
 namespace eval ::RingPiercing:: {
-    variable dirPackage $env(MMPDIR)
+    variable dirPackage $env(RPRDIR)
     variable dirCharmmPar $env(CHARMMPARDIR)
 
     variable w 
