@@ -3,7 +3,7 @@
 ## Overview
 
 This VMD plugin is designed to resolve ring piercings that can occur in molecular dynamics simulations systems. Ring piercings may arise from various scenarios, such as lipid tails passing through rings (e.g., in cholesterol), long protein side chains penetrating rings of other side chains (e.g., tryptophan), or lipids infiltrating protein side chains with rings. To address this issue, the plugin utilizes combination of methods such as the alchemical mode of NAMD, known as thermodynamic integration and volumetric repulsive grid forces.
-
+![alt text](https://github.com/dgozgulbas/RPplugin/blob/develop/img.png?raw=true)
 
 <!-- [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme) -->
 
@@ -74,11 +74,11 @@ To use the generator, look at [generator-standard-readme](https://github.com/Ric
 
 This project exists thanks to all the people who contribute. 
 - Defne Gorgun Ozgulbas
-- Dr. Joshua Vermaas
+- Dr. Josh Vermaas
 
 
 ## License
 
-[MIT](LICENSE) © Richard Littauer
+<!-- [MIT](LICENSE) © Richard Littauer -->
 
-![alt text](https://github.com/dgozgulbas/RPplugin/blob/develop/img.png?raw=true)
+
