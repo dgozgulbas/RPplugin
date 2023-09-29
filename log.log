@@ -1,0 +1,25 @@
+FATAL ERROR: UNABLE TO OPEN .psf FILE system.psf
+FATAL ERROR: UNABLE TO OPEN .psf FILE system.psf
+    while executing
+"::exec /Users/defnegorgun/Downloads/NAMD_2.14_MacOSX-x86_64-multicore/namd2 +idlepoll +setcpuaffinity +p16 /Users/defnegorgun/Desktop/RPplugin/ring_pi..."
+    ("eval" body line 1)
+    invoked from within
+"eval ::exec [list $exec_path] [lrange $args 1 end]"
+    (procedure "::ExecTool::exec" line 14)
+    invoked from within
+"::ExecTool::exec "/Users/defnegorgun/Downloads/NAMD_2.14_MacOSX-x86_64-multicore/namd2" +idlepoll +setcpuaffinity +p16 "/Users/defnegorgun/Desktop/RPp..."
+    ("eval" body line 1)
+    invoked from within
+"eval ::ExecTool::exec \"${namdcommand}\" ${namdargs} \"${conffiledir}\" > \"${logfiledir}.log\" "
+    (procedure "::RingPiercing::resolve_piercing" line 58)
+    invoked from within
+"::RingPiercing::resolve_piercing $::RingPiercing::outputpath $::RingPiercing::namdcommand $::RingPiercing::namdargs"
+    invoked from within
+".ringpiercingpackage.button1 invoke"
+    ("uplevel" body line 1)
+    invoked from within
+"uplevel #0 [list $w invoke]"
+    (procedure "tk::ButtonUp" line 23)
+    invoked from within
+"tk::ButtonUp .ringpiercingpackage.button1"
+    (command bound to event)

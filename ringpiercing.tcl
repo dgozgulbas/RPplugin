@@ -414,18 +414,22 @@ proc ::RingPiercing::resolve_piercing {outputpath namdcommand namdargs {namdextr
 #In this example, "name" would contain "system."
 #if psf is ring_piercing/system.psf
 
-    set psf $::RingPiercing::psffile
-    set pdb $::RingPiercing::pdbfile
-    puts "here1"
-    set tail [file tail $psf]
-    set name [file rootname $tail]
-
     file mkdir $outputpath/$::RingPiercing::name_dir
     set outpath [file join $outputpath $::RingPiercing::name_dir]
     puts $outpath
+
+    file copy -force $::RingPiercing::psffile $outpath/system.psf
+    file copy -force $::RingPiercing::pdbfile $outpath/system.pdb
+
+    set psf $outpath/system.psf
+    set pdb $outpath/system.pdb
+    # set psf $::RingPiercing::psffile
+    # set pdb $::RingPiercing::pdbfile
+    puts "here1"
+    set tail [file tail $psf]
+    set name [file rootname $tail]
     
-    file copy -force $psf $outpath
-    file copy -force $pdb $outpath
+
     file copy -force $::RingPiercing::conffile $outpath
     file copy -force $::RingPiercing::sourcefile $outpath
     exec cp -r $::RingPiercing::topparfolder $outpath
@@ -540,35 +544,35 @@ proc ::RingPiercing::resolve_piercing {outputpath namdcommand namdargs {namdextr
 # minimizestructures ::RingPiercing::outputpath ::RingPiercing::namdcommand ::RingPiercing::namdargs "parameters par_all36m_prot.prm \n"
 
 # Procedure to start and follow a NAMD simulation run
-proc ::MembraneMixer::StartFollowNAMD {root conf NAMDPATH OPTS} {
-    file delete ${root}.log
-    eval ::ExecTool::exec \"${NAMDPATH}\" ${OPTS} \"${conf}\" > \"${root}.log\" &
-    after 2000
-    # Wait until the simulation is done
-    set control [lindex [::MembraneMixer::GrepEmu "End of program" ${root}.log 0] 1]
-    puts3 -nonewline  "Waiting for NAMD job to finish..."
-    set c 0
-    while {!$control} {
-        display update ui
-        after 20
-        incr c
-        if {[expr {($c % 150) == 0}]} {
-            puts3 -nonewline "."
-            set control [lindex [::MembraneMixer::GrepEmu "End of program" ${root}.log 0] 1]
-            set control2 [lindex [::MembraneMixer::GrepEmu "FATAL ERROR" ${root}.log 0] 1]
-            # Check if fatal errors
-            if {$control2} {
-		set SKIPREP [::MembraneMixer::ErrorMessRun "   A FATAL ERROR occurred during NAMD job! SKIPPING THIS REPLICA!"]
-		return $SKIPREP
-            }
-        }
-    }
-    puts2 "Done."
-    display update ui
-    # Check if errors were found during simulations (e.g. Constraint failure)
-    set control3 [lindex [::MembraneMixer::GrepEmu "ERROR:" ${root}.log 0] 1]
-    if {$control3} {
-        puts2 "   AN ERROR WAS REPORTED IN NAMD LOG FILE! It might be related to ring piercing and might be corrected in next equilibration."
-    }
-    return 0
-}
+# proc ::MembraneMixer::StartFollowNAMD {root conf NAMDPATH OPTS} {
+#     file delete ${root}.log
+#     eval ::ExecTool::exec \"${NAMDPATH}\" ${OPTS} \"${conf}\" > \"${root}.log\" &
+#     after 2000
+#     # Wait until the simulation is done
+#     set control [lindex [::MembraneMixer::GrepEmu "End of program" ${root}.log 0] 1]
+#     puts3 -nonewline  "Waiting for NAMD job to finish..."
+#     set c 0
+#     while {!$control} {
+#         display update ui
+#         after 20
+#         incr c
+#         if {[expr {($c % 150) == 0}]} {
+#             puts3 -nonewline "."
+#             set control [lindex [::MembraneMixer::GrepEmu "End of program" ${root}.log 0] 1]
+#             set control2 [lindex [::MembraneMixer::GrepEmu "FATAL ERROR" ${root}.log 0] 1]
+#             # Check if fatal errors
+#             if {$control2} {
+# 		set SKIPREP [::MembraneMixer::ErrorMessRun "   A FATAL ERROR occurred during NAMD job! SKIPPING THIS REPLICA!"]
+# 		return $SKIPREP
+#             }
+#         }
+#     }
+#     puts2 "Done."
+#     display update ui
+#     # Check if errors were found during simulations (e.g. Constraint failure)
+#     set control3 [lindex [::MembraneMixer::GrepEmu "ERROR:" ${root}.log 0] 1]
+#     if {$control3} {
+#         puts2 "   AN ERROR WAS REPORTED IN NAMD LOG FILE! It might be related to ring piercing and might be corrected in next equilibration."
+#     }
+#     return 0
+# }
