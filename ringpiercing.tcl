@@ -528,14 +528,13 @@ proc ::RingPiercing::resolve_piercing {outputpath namdcommand namdargs {namdextr
     }
 
     $asel writepdb [file join $outpath $pdb]
-
     $asel delete
-
     $othersel delete
-
     $badbeta delete
-
     mol delete $mid
+
+    mol new $psf
+    mol addfile $pdb
 
 }
 
