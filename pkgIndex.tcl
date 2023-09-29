@@ -8,4 +8,4 @@
 # script is sourced, the variable $dir must contain the
 # full path name of this file's directory.
 
-package ifneeded membranemixer 1.0 "set env(RPRDIR) [list $dir]; [list source [file join $dir membranemixer.tcl]]"
+package ifneeded membranemixer 1.0 "set env(RPRDIR) [list $dir]; [list source [file join $dir ringpiercing.tcl]]"

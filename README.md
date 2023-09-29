@@ -40,7 +40,7 @@ To use this plugin, follow these installation steps:
     vmd_install_extension ringpiercingpackage ringpiercingpackage_tk "Modeling/Ring Piercing Resolver"
     ```
 
-## Input Files
+## Input/Output Files
 
 - **PSF (Protein Structure File):** The topology file representing the molecular structure.
 
@@ -49,6 +49,8 @@ To use this plugin, follow these installation steps:
 - **Custom Parameter Files:** Optionally, you can provide custom parameter files for specific force fields or interactions in your simulation.
 
 - **Custom Simulation Configuration File:** Optionally, you can specify a custom simulation configuration file for the minimization step.
+
+- **Output Files**: The plugin generates corrected PDB and PSF files, representing the system after resolving ring piercings.
 
 
 ## Maintainers
