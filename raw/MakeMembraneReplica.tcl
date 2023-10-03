@@ -13,6 +13,8 @@
 ## Citation: 
 ##   
 ##==============================================================================
+# source ringpiercing.tcl
+# vmd_install_extension ringpiercingpackage ringpiercingpackage_tk "Modeling/Ring Piecing Resolver"
 
 package provide membranemixerpackage 1.0
 
@@ -291,7 +293,7 @@ proc ::MembraneMixerPackage::membranemixerpackage {} {
     grid columnconfigure $f.run 1 -weight 1
     pack $f.run -side top -padx 2 -pady 6 -expand 0 -fill both
     
-    grid [button $f.button1 -text "RUN NOW!" -width 20 -state normal \
+    pack [button $f.button1 -text "RUN NOW!" -width 20 -state normal \
     -command {set ::MembraneMixerPackage::BuildScript 0; ::MembraneMixerPackage::run_exchange}]  -side top -padx 2 -pady 6 -expand 0 -fill both
     ::TKTOOLTIP::balloon $f.button1 "Start membrane generation in current VMD session."
     pack [button $f.button2 -text "Build script" -width 20 -state normal \

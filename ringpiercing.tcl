@@ -277,9 +277,9 @@ variable psffile
     grid [button $f.button1 -text "RUN!" -width 20 -state normal \
     -command {set ::RingPiercing::BuildScript 0; ::RingPiercing::resolve_piercing $::RingPiercing::outputpath $::RingPiercing::namdcommand $::RingPiercing::namdargs}] -row 6 -column 0 -padx 4 -pady 4 -sticky we
     ::TKTOOLTIP::balloon $f.button1 "Start resolving piercings in current VMD session."
-    grid [button $f.button2 -text "Build script" -width 20 -state normal \
-    -command {set ::RingPiercing::BuildScript 1; ::RingPiercing::prepareRunScript}]  -row 7 -column 0 -padx 4 -pady 4 -sticky we
-    ::TKTOOLTIP::balloon $f.button2 "Prepare script to run Ring Piercing Resolver later.\nThis is particularly useful if one wants to\nrun in another computer or in a cluster."
+    # grid [button $f.button2 -text "Build script" -width 20 -state normal \
+    # -command {set ::RingPiercing::BuildScript 1; ::RingPiercing::prepareRunScript}]  -row 7 -column 0 -padx 4 -pady 4 -sticky we
+    # ::TKTOOLTIP::balloon $f.button2 "Prepare script to run Ring Piercing Resolver later.\nThis is particularly useful if one wants to\nrun in another computer or in a cluster."
     
     # Statusbar
     frame $f.statusbar -bd 2 -relief ridge
