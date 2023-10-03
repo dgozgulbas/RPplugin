@@ -244,7 +244,7 @@ variable psffile
             set tempdir [tk_chooseDirectory -title "Select an output path"]
             if {![string equal $tempdir ""]} { set ::RingPiercing::outputpath $tempdir }
         }] -row 8 -column 3 -sticky ew
-    foreach l {"label" "path" "button"} {::TKTOOLTIP::balloon $f.input.output${l} "Provide an output path that specifies the master folder for running the simulations.\nMembrane replicas will be moved in separate folders within the master folder."}
+    foreach l {"label" "path" "button"} {::TKTOOLTIP::balloon $f.input.output${l} "Provide an output path that specifies the master folder for running the simulations.\nSimulation files along with the output will be moved in to ring_piercing folder within the master folder."}
 
      # Run plugin
     frame $f.run -bd 2 -relief ridge
