@@ -16,7 +16,7 @@ set runnumber 10
 set outputname		out
 set temperature    310
 firsttimestep 0
-source ring.str
+#source ring.str
 
 #############################################################
 ## SIMULATION PARAMETERS                                   ##
