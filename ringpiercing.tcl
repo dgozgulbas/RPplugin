@@ -46,7 +46,7 @@ namespace eval ::RingPiercing:: {
     variable custom_conffile 0
     variable addtopfile 0
     variable conffile "minimize.namd"; # this configuration file must already run properly in the current directory
-    variable sourcefile "ring.str";
+    #variable sourcefile "ring.str";
     variable topparfolder "toppar";
     #variable conffile {}; # this configuration file must already run properly in the current directory
     variable name_dir "ring_piercing"
@@ -111,7 +111,7 @@ variable psffile
     trace add variable ::RingPiercing::psffile write ::RingPiercing::psffileCheck
     trace add variable ::RingPiercing::pdbfile write ::RingPiercing::pdbfileCheck
     trace add variable ::RingPiercing::conffile write ::RingPiercing::conffileCheck
-    trace add variable ::RingPiercing::sourcefile write ::RingPiercing::sourcefileCheck
+    #trace add variable ::RingPiercing::sourcefile write ::RingPiercing::sourcefileCheck
     trace add variable ::RingPiercing::topparfolder write ::RingPiercing::topparfolderCheck
     trace add variable ::RingPiercing::outputpath write ::RingPiercing::outputpathCheck
     trace add variable ::RingPiercing::lselection write ::RingPiercing::lselectionCheck
@@ -431,7 +431,7 @@ proc ::RingPiercing::resolve_piercing {outputpath namdcommand namdargs {namdextr
     
 
     file copy -force $::RingPiercing::conffile $outpath
-    file copy -force $::RingPiercing::sourcefile $outpath
+    #file copy -force $::RingPiercing::sourcefile $outpath
     exec cp -r $::RingPiercing::topparfolder $outpath
 
     # Creates a new molecular object ("mol") named "mid" using the PSF file.
